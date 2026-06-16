@@ -50,9 +50,11 @@ Restart Claude Code. You (and Claude) now have a `consult_council` tool. Say
 *"ask the council first"*, or add this to your project's `CLAUDE.md` to make it
 semi-automatic:
 
-> Before implementing anything consequential (security, money, migrations,
-> irreversible changes), call `consult_council` with the plan and relevant code,
-> then weigh the critiques before acting.
+> When council mode is on: decide your own plan first (read the code, choose an
+> approach). Before executing, call `consult_council` with your proposed plan AND
+> the real context you used (the files/snippets you read, constraints, reasoning).
+> Read the critiques, incorporate the valid ones and reject the wrong ones (say
+> why), then act. The council critiques your plan — it doesn't make it for you.
 
 Because MCP is a standard, the same server also works in Cursor, Claude Desktop,
 and other MCP clients.
