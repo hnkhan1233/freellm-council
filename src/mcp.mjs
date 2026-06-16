@@ -19,11 +19,13 @@ const server = new Server(
 const TOOL = {
   name: 'consult_council',
   description:
-    'Get a second opinion from a council of free LLMs before acting on a consequential decision. '
-    + 'Fans the question + context out to several free models in parallel and returns their independent critiques '
-    + '(each with a verdict: approve/concerns/reject). Use this before implementing risky, costly, or hard-to-reverse '
-    + 'changes (security, money, data migrations, architecture, irreversible deletes) or when you want adversarial review '
-    + 'of a plan. YOU make the final decision — this only surfaces what the advisors flagged.',
+    'Get a second opinion from a council of free LLMs. Fans the question + context out to several free models in '
+    + 'parallel and returns their independent critiques (each with a verdict: approve/concerns/reject). '
+    + 'Call this in two situations: (1) on-demand, before a consequential/risky/hard-to-reverse change '
+    + '(security, money, migrations, architecture); and (2) whenever the user has turned "council mode" ON for the '
+    + 'session — in that mode you MUST call this before producing ANY code, design, or plan, no matter how trivial '
+    + 'or obvious the task seems (do not skip it for being "simple"). YOU still make the final decision; this only '
+    + 'surfaces what the advisors flagged.',
   inputSchema: {
     type: 'object',
     properties: {
