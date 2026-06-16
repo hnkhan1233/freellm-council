@@ -57,6 +57,24 @@ semi-automatic:
 Because MCP is a standard, the same server also works in Cursor, Claude Desktop,
 and other MCP clients.
 
+## Hard enforcement (optional)
+
+The CLAUDE.md rule is soft (instruction-following). For a guarantee that nothing
+gets built while council mode is ON without a consult first, wire the hooks in
+`hooks/` into `~/.claude/settings.json`:
+
+- `council-on-prompt.mjs` → **UserPromptSubmit** — flips mode on/off from your
+  message ("council on" / "council off") and resets the per-turn consult marker.
+- `council-gate-edit.mjs` → **PreToolUse** (matcher `Write|Edit|MultiEdit|NotebookEdit`)
+  — blocks edits (exit 2) while ON until the council has been consulted this turn.
+- `council-after-consult.mjs` → **PostToolUse** (matcher `mcp__council__consult_council`)
+  — records the consult, unlocking the gate.
+
+State lives in `~/.claude/council/` (`mode`, `consulted`). Default is OFF, so the
+gate is a no-op until you say "council on". Hooks load at session start — restart
+or open `/hooks` after wiring them. (Note: file writes via the Bash tool are not
+gated; the gate covers the Write/Edit family.)
+
 ## Configuration
 
 | Env var | Default | Purpose |
