@@ -70,10 +70,13 @@ gets built while council mode is ON without a consult first, wire the hooks in
 - `council-after-consult.mjs` → **PostToolUse** (matcher `mcp__council__consult_council`)
   — records the consult, unlocking the gate.
 
-State lives in `~/.claude/council/` (`mode`, `consulted`). Default is OFF, so the
-gate is a no-op until you say "council on". Hooks load at session start — restart
-or open `/hooks` after wiring them. (Note: file writes via the Bash tool are not
-gated; the gate covers the Write/Edit family.)
+State is **per session** — keyed by `session_id` in `~/.claude/council/`
+(`mode-<id>`, `consulted-<id>`). Turning it on in one session does NOT affect
+others, and every new session starts OFF. The toggle only fires when your whole
+message is the command ("council on" / "council off"), so mentioning the phrase
+in a sentence won't flip it. Hooks load at session start — restart or open
+`/hooks` after wiring them. (Note: file writes via the Bash tool are not gated;
+the gate covers the Write/Edit family.)
 
 ## Configuration
 
