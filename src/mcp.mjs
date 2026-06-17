@@ -35,11 +35,28 @@ const TOOL = {
       },
       context: {
         type: 'string',
-        description: 'The plan, code, diff, and background the council needs. Include the salient parts — not the whole transcript.',
+        description: 'Raw background to include verbatim. Optional if you use plan/files/diff. Do not paste whole files here — pass them via `files` instead.',
+      },
+      plan: {
+        type: 'string',
+        description: 'Your proposed approach/plan for the council to critique. The council critiques your plan; it does not make it.',
+      },
+      files: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'File paths (absolute, or relative to `cwd`) the council should read and review — the real code, not a paraphrase. Included with line numbers.',
+      },
+      diff: {
+        type: 'string',
+        description: 'Include a git diff: "working" (or true) for the working tree, or a ref/range like "HEAD~1", "--staged", "main...". Reviewed as a patch.',
+      },
+      cwd: {
+        type: 'string',
+        description: 'Repo/base directory for resolving `files` and running `diff`. Pass the project root you are working in.',
       },
       task_type: {
         type: 'string',
-        description: 'What kind of task this is — drives which free models are selected. Use one of: code, debug, refactor, architecture, design, security, performance, data, sql, math, algorithm, writing, docs, ui, vision, general.',
+        description: 'What kind of task this is — drives which free models are selected AND the review focus injected into the prompt. Use one of: code, debug, refactor, architecture, design, security, performance, data, sql, math, algorithm, writing, docs, ui, vision, general.',
       },
       models: {
         type: 'array',
@@ -58,8 +75,8 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
     return { isError: true, content: [{ type: 'text', text: `Unknown tool: ${req.params.name}` }] }
   }
   try {
-    const { question, context = '', task_type, models } = req.params.arguments || {}
-    const result = await consultCouncil({ question, context, task_type, models })
+    const { question, context = '', plan, files, diff, cwd, task_type, models } = req.params.arguments || {}
+    const result = await consultCouncil({ question, context, plan, files, diff, cwd, task_type, models })
 
     const lines = [`# Council report — task: ${result.selection.task_type} · ${result.stats.answered}/${result.stats.asked} answered (${(result.elapsedMs / 1000).toFixed(1)}s)`, '']
     for (const p of result.panel) {

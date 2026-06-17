@@ -9,6 +9,7 @@ import './env.mjs'
 import { PROVIDERS, canonical } from './providers.mjs'
 import { getCatalog } from './catalog.mjs'
 import { recordResults, penaltyFor } from './health.mjs'
+import { buildContext } from './context.mjs'
 
 // Provider lookup for routing (id -> {baseUrl, keyEnv}).
 const PROVIDER_BY_ID = Object.fromEntries(PROVIDERS.map((p) => [p.id, p]))
@@ -46,6 +47,32 @@ function profileFor(task) {
   const t = (task || 'general').toLowerCase()
   for (const k of Object.keys(TASK_PROFILES)) if (t.includes(k)) return TASK_PROFILES[k]
   return TASK_PROFILES.general
+}
+
+// task_type -> what the reviewers should prioritize (injected into the prompt so
+// the selected models review with the right lens, not blind).
+const TASK_FOCUS = {
+  code: 'correctness, edge cases, and error handling',
+  debug: 'the actual root cause and any incorrect assumptions',
+  refactor: 'behavior preservation, regressions, and simpler approaches',
+  architecture: 'scalability, coupling, failure modes, and simpler designs',
+  design: 'coherence of the approach, edge cases, and simpler alternatives',
+  security: 'auth/authz, injection, secrets handling, input validation, and timing/replay attacks',
+  performance: 'algorithmic complexity, allocations, N+1 queries, and re-renders',
+  data: 'schema/migration safety, data loss, and integrity',
+  sql: 'injection, missing indexes, and incorrect joins/aggregations',
+  math: 'correctness of the formula/algorithm and numerical edge cases',
+  algorithm: 'correctness, complexity, and edge cases',
+  writing: 'clarity, accuracy, and structure',
+  docs: 'accuracy, completeness, and clarity',
+  ui: 'usability, accessibility, and responsive/edge-state handling',
+  vision: 'what is actually shown vs intended, and visual/UX issues',
+  general: 'correctness, risks, and missing cases',
+}
+function focusFor(task) {
+  const t = (task || 'general').toLowerCase()
+  for (const k of Object.keys(TASK_FOCUS)) if (t.includes(k)) return TASK_FOCUS[k]
+  return TASK_FOCUS.general
 }
 
 // Bias toward known-strong free reviewers; penalize tiny models.
@@ -114,16 +141,17 @@ function route(providerId) {
 }
 
 // One model call, routed to its provider, with retries on rate-limit / transient errors.
-async function askModel(model, question, context, { signal } = {}) {
+async function askModel(model, question, context, { signal, focus } = {}) {
   const r = route(model.provider)
   if (!r) return { ok: false, error: `no key for provider ${model.provider}` }
   const headers = { Authorization: `Bearer ${r.key}`, 'Content-Type': 'application/json' }
   if (r.id === 'openrouter') { headers['HTTP-Referer'] = 'https://github.com/freellm-council'; headers['X-Title'] = 'FreeLLM Council' }
+  const focusLine = focus ? `REVIEW FOCUS: ${focus}. Prioritize this, but still flag any other serious issue.\n\n` : ''
   const body = {
     model: model.id,
     messages: [
       { role: 'system', content: REVIEWER_SYSTEM },
-      { role: 'user', content: `QUESTION:\n${question}\n\nCONTEXT:\n${context}` },
+      { role: 'user', content: `${focusLine}QUESTION:\n${question}\n\nCONTEXT:\n${context}` },
     ],
     temperature: 0.4,
     max_tokens: 900,
@@ -168,8 +196,15 @@ function parseVerdict(critique) {
  * @param {number} [o.count]       panel size (default 4)
  * @param {number} [o.timeoutMs]   per-model timeout (default 90s)
  */
-export async function consultCouncil({ question, context = '', task_type, models, count = 4, timeoutMs = 90_000 } = {}) {
+export async function consultCouncil({ question, context = '', plan, files, diff, cwd, task_type, models, count = 4, timeoutMs = 90_000 } = {}) {
   if (!question) throw new Error('A question is required.')
+
+  // Assemble the context the council reviews: from a plan + real files + a git
+  // diff if given, else use the raw context string verbatim.
+  const effectiveContext = (plan || (files && files.length) || diff)
+    ? buildContext({ plan, context, files, diff, cwd })
+    : context
+  const focus = focusFor(task_type)
 
   const catalog = await getCatalog().catch(() => null)
   let primary, pool = []
@@ -193,7 +228,7 @@ export async function consultCouncil({ question, context = '', task_type, models
   const run = (m) => {
     const ctrl = new AbortController()
     const timer = setTimeout(() => ctrl.abort(), timeoutMs)
-    return askModel(m, question, context, { signal: ctrl.signal })
+    return askModel(m, question, effectiveContext, { signal: ctrl.signal, focus })
       .then((r) => ({ model: m.id, provider: m.provider, ...r }))
       .finally(() => clearTimeout(timer))
   }

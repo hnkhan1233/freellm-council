@@ -17,6 +17,10 @@ function parseArgs(argv) {
     else if (a === '-c' || a === '--context') o.context = argv[++i]
     else if (a === '-f' || a === '--context-file') o.context = readFileSync(argv[++i], 'utf8')
     else if (a === '-t' || a === '--task') o.task_type = argv[++i]
+    else if (a === '--plan') o.plan = argv[++i]
+    else if (a === '--files') o.files = argv[++i].split(',').map((s) => s.trim()).filter(Boolean)
+    else if (a === '--diff') { const n = argv[i + 1]; if (n && !n.startsWith('-')) o.diff = argv[++i]; else o.diff = true }
+    else if (a === '--cwd') o.cwd = argv[++i]
     else if (a === '--models') o.models = argv[++i].split(',').map((s) => s.trim())
     else if (a === '--json') o.json = true
     else if (!o.question) o.question = a
@@ -37,7 +41,7 @@ const verdictColor = (v) => (v === 'approve' ? C.g : v === 'reject' ? C.r : v ==
 const args = parseArgs(process.argv.slice(2))
 if (!args.context) args.context = await readStdin()
 if (!args.question) {
-  console.error('Usage: node src/cli.mjs -q "question" [-t task] [-f context-file | -c "context"] [--models a,b] [--json]')
+  console.error('Usage: node src/cli.mjs -q "question" [-t task] [--plan "..."] [--files a.ts,b.ts] [--diff [ref]] [--cwd dir] [-f file | -c "ctx"] [--models a,b] [--json]')
   process.exit(1)
 }
 
