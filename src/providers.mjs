@@ -65,7 +65,7 @@ export const CATEGORIES = ['coding', 'reasoning', 'math', 'vision', 'long-contex
 // Models that aren't usable as a council reviewer (speech, audio/music, image,
 // safety classifiers, embeddings). Filtered out so the roster reflects real
 // chat/reasoning capacity, not transcription or guard models.
-export const NON_CHAT = /whisper|orpheus|\btts\b|prompt-guard|safeguard|llama-guard|guardrail|content-safety|\bsafety\b|embed|moderation|rerank|\bbge\b|lyria|stable-diffusion|sdxl|\bflux\b|dall-?e|imagen|\bveo\b|\bocr\b|\bsora\b|speech|transcrib/i
+export const NON_CHAT = /whisper|orpheus|\btts\b|prompt-guard|safeguard|llama-guard|guardrail|content-safety|\bsafety\b|embed|moderation|rerank|\bbge\b|lyria|stable-diffusion|sdxl|\bflux\b|dall-?e|imagen|gpt-image|image-generation|image-preview|-image\b|\bveo\b|\bocr\b|\bsora\b|speech|transcrib/i
 
 // Collapse a model id to its "family" so date-stamped and -latest aliases of the
 // same model (e.g. codestral-2508 / codestral-latest) count once, not many times.

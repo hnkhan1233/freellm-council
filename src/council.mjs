@@ -8,6 +8,7 @@
 import './env.mjs'
 import { PROVIDERS, canonical } from './providers.mjs'
 import { getCatalog } from './catalog.mjs'
+import { recordResults, penaltyFor } from './health.mjs'
 
 // Provider lookup for routing (id -> {baseUrl, keyEnv}).
 const PROVIDER_BY_ID = Object.fromEntries(PROVIDERS.map((p) => [p.id, p]))
@@ -57,6 +58,7 @@ function scoreModel(m, prefCats) {
   if (FAVORITES.test(m.id)) s += 5
   if (TINY.test(m.id)) s -= 6
   if ((m.ctx || 0) >= 100_000) s += 1
+  s -= penaltyFor(m.id) // deprioritize models that keep failing (learned over calls)
   return s
 }
 
@@ -209,6 +211,7 @@ export async function consultCouncil({ question, context = '', task_type, models
   }
 
   panel = panel.map((p) => (p.ok ? { ...p, ...parseVerdict(p.critique) } : p))
+  recordResults(panel) // learn which models answered vs failed, for future selection
   const ok = panel.filter((p) => p.ok)
   const tally = { approve: 0, concerns: 0, reject: 0, unknown: 0 }
   ok.forEach((p) => { tally[p.verdict] = (tally[p.verdict] || 0) + 1 })
