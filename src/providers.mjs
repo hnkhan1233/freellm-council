@@ -65,5 +65,14 @@ export const CATEGORIES = ['coding', 'reasoning', 'math', 'vision', 'long-contex
 // Models that aren't usable as a council reviewer (speech, audio/music, image,
 // safety classifiers, embeddings). Filtered out so the roster reflects real
 // chat/reasoning capacity, not transcription or guard models.
-export const NON_CHAT = /whisper|orpheus|\btts\b|prompt-guard|safeguard|llama-guard|guardrail|embed|moderation|rerank|\bbge\b|lyria|stable-diffusion|sdxl|\bflux\b|dall-?e|imagen|\bsora\b|speech|transcrib/i
+export const NON_CHAT = /whisper|orpheus|\btts\b|prompt-guard|safeguard|llama-guard|guardrail|embed|moderation|rerank|\bbge\b|lyria|stable-diffusion|sdxl|\bflux\b|dall-?e|imagen|\bveo\b|\bocr\b|\bsora\b|speech|transcrib/i
+
+// Collapse a model id to its "family" so date-stamped and -latest aliases of the
+// same model (e.g. codestral-2508 / codestral-latest) count once, not many times.
+export function canonical(id) {
+  return (id || '').toLowerCase()
+    .replace(/-latest$/, '')
+    .replace(/-\d{6}$/, '')   // -YYMMDD
+    .replace(/-\d{4}$/, '')   // -YYMM
+}
 
