@@ -32,9 +32,15 @@ Get a free key at https://openrouter.ai/keys.
 
 ```bash
 export OPENROUTER_API_KEY=sk-or-...
-node src/cli.mjs -q "Any risks in this Stripe webhook flow?" -f plan.md
-git diff | node src/cli.mjs -q "Review this diff for bugs"
+node src/cli.mjs -t code -q "Any risks in this Stripe webhook flow?" -f plan.md
+git diff | node src/cli.mjs -t code -q "Review this diff for bugs"
+npm run status   # see how powerful your council is (providers, models, per-category)
 ```
+
+`-t <task_type>` (code, security, architecture, math, …) selects the most relevant
+free models for the task. Add more providers in `.env` (`GROQ_API_KEY`,
+`CEREBRAS_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, …) and the council fans
+out across all of them, routing each request to the right provider.
 
 ## Use it inside Claude Code (the main point)
 

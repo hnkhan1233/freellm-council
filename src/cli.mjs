@@ -16,6 +16,7 @@ function parseArgs(argv) {
     if (a === '-q' || a === '--question') o.question = argv[++i]
     else if (a === '-c' || a === '--context') o.context = argv[++i]
     else if (a === '-f' || a === '--context-file') o.context = readFileSync(argv[++i], 'utf8')
+    else if (a === '-t' || a === '--task') o.task_type = argv[++i]
     else if (a === '--models') o.models = argv[++i].split(',').map((s) => s.trim())
     else if (a === '--json') o.json = true
     else if (!o.question) o.question = a
@@ -36,7 +37,7 @@ const verdictColor = (v) => (v === 'approve' ? C.g : v === 'reject' ? C.r : v ==
 const args = parseArgs(process.argv.slice(2))
 if (!args.context) args.context = await readStdin()
 if (!args.question) {
-  console.error('Usage: node src/cli.mjs -q "question" [-f context-file | -c "context"] [--models a,b] [--json]')
+  console.error('Usage: node src/cli.mjs -q "question" [-t task] [-f context-file | -c "context"] [--models a,b] [--json]')
   process.exit(1)
 }
 
@@ -46,10 +47,10 @@ const result = await consultCouncil(args)
 if (args.json) {
   console.log(JSON.stringify(result, null, 2))
 } else {
-  const { panel, stats, elapsedMs } = result
-  console.log('\n' + C.b('═══ COUNCIL REPORT ') + C.dim(`(${stats.answered}/${stats.asked} answered, ${(elapsedMs / 1000).toFixed(1)}s)`))
+  const { panel, stats, elapsedMs, selection } = result
+  console.log('\n' + C.b('═══ COUNCIL REPORT ') + C.dim(`(task: ${selection.task_type} · ${selection.source} · ${stats.answered}/${stats.asked} answered, ${(elapsedMs / 1000).toFixed(1)}s)`))
   for (const p of panel) {
-    console.log('\n' + C.b('▸ ' + p.model))
+    console.log('\n' + C.b('▸ ' + p.model) + C.dim(`  [${p.provider}]`))
     if (!p.ok) { console.log('  ' + C.r('✗ no response — ' + p.error)); continue }
     console.log('  ' + verdictColor(p.verdict)(`[${p.verdict.toUpperCase()} · ${p.confidence}]`))
     console.log(p.critique.split('\n').map((l) => '  ' + l).join('\n'))

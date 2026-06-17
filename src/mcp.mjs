@@ -37,10 +37,14 @@ const TOOL = {
         type: 'string',
         description: 'The plan, code, diff, and background the council needs. Include the salient parts — not the whole transcript.',
       },
+      task_type: {
+        type: 'string',
+        description: 'What kind of task this is — drives which free models are selected. Use one of: code, debug, refactor, architecture, design, security, performance, data, sql, math, algorithm, writing, docs, ui, vision, general.',
+      },
       models: {
         type: 'array',
         items: { type: 'string' },
-        description: 'Optional: override the panel with specific OpenRouter model ids.',
+        description: 'Optional: override selection with specific model ids.',
       },
     },
     required: ['question'],
@@ -54,13 +58,13 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
     return { isError: true, content: [{ type: 'text', text: `Unknown tool: ${req.params.name}` }] }
   }
   try {
-    const { question, context = '', models } = req.params.arguments || {}
-    const result = await consultCouncil({ question, context, models })
+    const { question, context = '', task_type, models } = req.params.arguments || {}
+    const result = await consultCouncil({ question, context, task_type, models })
 
-    const lines = [`# Council report — ${result.stats.answered}/${result.stats.asked} answered (${(result.elapsedMs / 1000).toFixed(1)}s)`, '']
+    const lines = [`# Council report — task: ${result.selection.task_type} · ${result.stats.answered}/${result.stats.asked} answered (${(result.elapsedMs / 1000).toFixed(1)}s)`, '']
     for (const p of result.panel) {
-      if (!p.ok) { lines.push(`## ${p.model}\n_no response — ${p.error}_\n`); continue }
-      lines.push(`## ${p.model} — **${p.verdict}** (${p.confidence})`, p.critique, '')
+      if (!p.ok) { lines.push(`## ${p.model} _(${p.provider})_\n_no response — ${p.error}_\n`); continue }
+      lines.push(`## ${p.model} _(${p.provider})_ — **${p.verdict}** (${p.confidence})`, p.critique, '')
     }
     const v = result.stats.verdicts
     lines.push(`---`, `Tally: ${v.approve} approve · ${v.concerns} concerns · ${v.reject} reject${v.unknown ? ` · ${v.unknown} unknown` : ''}`)

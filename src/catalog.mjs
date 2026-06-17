@@ -3,7 +3,13 @@
 // This is what powers the "how powerful is the council" report and (next) the
 // task-aware model selection.
 import './env.mjs'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 import { PROVIDERS, categorize, CATEGORIES, NON_CHAT, canonical } from './providers.mjs'
+
+const CACHE_DIR = join(homedir(), '.claude', 'council')
+const CACHE_FILE = join(CACHE_DIR, 'catalog.json')
 
 async function listProvider(p) {
   const key = process.env[p.keyEnv]
@@ -43,4 +49,22 @@ export async function buildCatalog() {
     byCategory,
     models: all,
   }
+}
+
+// Build fresh AND write the cache. Used by `status` so running it also primes
+// the council's cache.
+export async function refreshCatalog() {
+  const data = await buildCatalog()
+  try { mkdirSync(CACHE_DIR, { recursive: true }); writeFileSync(CACHE_FILE, JSON.stringify({ at: Date.now(), data })) } catch { /* cache is best-effort */ }
+  return data
+}
+
+// Return a cached catalog if it's fresh, else rebuild. The council uses this so
+// it doesn't re-query all providers on every consult.
+export async function getCatalog({ maxAgeMs = 1_800_000 } = {}) {
+  try {
+    const raw = JSON.parse(readFileSync(CACHE_FILE, 'utf8'))
+    if (raw?.at && Date.now() - raw.at < maxAgeMs && raw.data?.models?.length) return raw.data
+  } catch { /* no/old cache → rebuild */ }
+  return refreshCatalog()
 }

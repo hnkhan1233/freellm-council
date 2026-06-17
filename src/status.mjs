@@ -2,14 +2,14 @@
 // `council status` — shows how powerful your council is: which providers are lit,
 // how many live free models you have across all of them, the per-capability
 // breakdown, and which providers to add for more power.
-import { buildCatalog } from './catalog.mjs'
+import { refreshCatalog } from './catalog.mjs'
 import { PROVIDERS, CATEGORIES } from './providers.mjs'
 
 const C = { b: (s) => `\x1b[1m${s}\x1b[0m`, dim: (s) => `\x1b[2m${s}\x1b[0m`, g: (s) => `\x1b[32m${s}\x1b[0m`, y: (s) => `\x1b[33m${s}\x1b[0m`, r: (s) => `\x1b[31m${s}\x1b[0m`, c: (s) => `\x1b[36m${s}\x1b[0m` }
 const strength = (n) => (n >= 6 ? C.g('STRONG') : n >= 3 ? C.y('MODERATE') : n >= 1 ? C.r('WEAK') : C.dim('—'))
 const bar = (n, max) => '█'.repeat(Math.round((n / Math.max(max, 1)) * 22)).padEnd(22, '·')
 
-const cat = await buildCatalog()
+const cat = await refreshCatalog()
 
 console.log('\n' + C.b('═══ COUNCIL ROSTER ') + C.dim(`(${cat.liveCount}/${PROVIDERS.length} providers lit · ${cat.total} live free models)`))
 
