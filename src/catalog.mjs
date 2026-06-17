@@ -2,7 +2,8 @@
 // keeps the free ones, tags each by capability, and aggregates per-category counts.
 // This is what powers the "how powerful is the council" report and (next) the
 // task-aware model selection.
-import { PROVIDERS, categorize, CATEGORIES } from './providers.mjs'
+import './env.mjs'
+import { PROVIDERS, categorize, CATEGORIES, NON_CHAT } from './providers.mjs'
 
 async function listProvider(p) {
   const key = process.env[p.keyEnv]
@@ -15,7 +16,9 @@ async function listProvider(p) {
     }).finally(() => clearTimeout(timer))
     if (!res.ok) return { id: p.id, label: p.label, configured: true, ok: false, error: `HTTP ${res.status}`, models: [] }
     const data = await res.json()
-    const models = p.pickModels(data).map((m) => ({ ...m, provider: p.id, cats: categorize(m) }))
+    const models = p.pickModels(data)
+      .filter((m) => !NON_CHAT.test(m.id))
+      .map((m) => ({ ...m, provider: p.id, cats: categorize(m) }))
     return { id: p.id, label: p.label, configured: true, ok: true, models }
   } catch (e) {
     return { id: p.id, label: p.label, configured: true, ok: false, error: e?.name === 'AbortError' ? 'timeout' : String(e?.message || e), models: [] }

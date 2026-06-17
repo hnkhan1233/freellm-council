@@ -9,6 +9,8 @@
 // many free models). To route through a gateway like FreeLLMAPI instead, set
 // OPENAI_BASE_URL to that gateway's /v1 URL — no code change needed.
 
+import './env.mjs'
+
 const BASE_URL = (process.env.OPENAI_BASE_URL || 'https://openrouter.ai/api/v1').replace(/\/$/, '')
 const API_KEY = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || ''
 
