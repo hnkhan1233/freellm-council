@@ -1,0 +1,322 @@
+{
+  "HumanEval/63": {
+    "verdicts": {
+      "approve": 0,
+      "concerns": 1,
+      "reject": 3,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "reject",
+        "critique": "### Review\n\nThe provided solution raises an exception for any input, which is not correct for the given spec. The spec requires the function to compute the n-th element of the FibFib number sequence, but the solution does not implement this logic. Instead, it raises an exception, which is not a valid output for any input within the spec.\n\n### Verdict\nVERDICT: reject\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "verdict": "reject",
+        "critique": "The function`fibfib(*a, **k)` does not implement the FibFib recurrence at all; it always raises an exception.  \nFor a concrete spec‑compliant input, e.g., `n = 5`, the expected result is `4` (as shown in the docstring). The provided solution raises `Exception('solver failed: rate-limited')` instead of returning `4`, which is a clear incorrect behavior.\n\nVERDICT: reject  \nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "concerns",
+        "critique": "The solution does not implement the required logic; it unconditionally raises an exception. For any valid input (e.g., `n = 0`), the function should return `0` according to the definition, but instead it raises `Exception('solver failed: rate-limited')`. This is a concrete counterexample showing incorrect behavior.\n\nVERDICT: concerns\nCONFIDENCE: high"
+      },
+      {
+        "model": "openai/gpt-oss-120b",
+        "verdict": "reject",
+        "critique": "The submitted code does not compute the FibFib sequence at all; it immediately raises an exception for any call. For example, `fibfib(5)` should return `4` per the specification, but the function raises `Exception('solver failed: rate-limited')`. This concrete counter‑example shows the solution is incorrect.\n\nVERDICT: reject\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/10": {
+    "verdicts": {
+      "approve": 4,
+      "concerns": 0,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "approve",
+        "critique": "The provided solution for `make_palindrome` is correct for the given examples and the described algorithm. The function correctly identifies the longest palindromic postfix and appends the reverse of the remaining prefix to form the shortest palindrome.\n\nFor example:\n- Input: 'cat' → Longest palindromic postfix is 't' → Append reverse of 'ca' → 'catac' ✓\n- Input: 'cata' → Longest palindromic postfix is 'ata' → Append reverse of 'c' → 'catac' ✓\n\nThe solution handles edge cases, such as an empty string, correctly. It also uses the helper function `is_palindrome` effectively to check for palindromes.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "verdict": "approve",
+        "critique": "VERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "approve",
+        "critique": "VERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "openai/gpt-oss-120b",
+        "verdict": "approve",
+        "critique": "The implementation correctly handles the empty string, single‑character strings, already‑palindromic inputs, and any other string by finding the longest palindromic suffix and appending the reverse of the preceding prefix. This always produces a palindrome that starts with the original string, and because the suffix chosen is the longest possible, the added characters are minimal, yielding the shortest such palindrome. No concrete input within the specification can be exhibited where the function returns an incorrect or non‑shortest result.\n\nVERDICT: approve\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/39": {
+    "verdicts": {
+      "approve": 3,
+      "concerns": 0,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "approve",
+        "critique": "The provided solution correctly implements the `prime_fib` function as specified. It generates Fibonacci numbers and checks if they are prime, counting the prime Fibonacci numbers until it reaches the nth one. The `is_prime` helper function correctly identifies prime numbers by checking divisibility up to the square root of the number.\n\nThe provided doctests all pass, and there are no concrete inputs within the spec that yield a wrong answer. The solution handles the edge case of `n=1` correctly, returning the first prime Fibonacci number, which is 2.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "openai/gpt-oss-120b",
+        "verdict": "approve",
+        "critique": "The implementation correctly generates Fibonacci numbers in order, checks each for primality, counts matches, and returns the n‑th prime Fibonacci number. For all positive integer inputs n ≥ 1 it produces the expected sequence (2, 3, 5, 13, 89, …). The only undefined behavior is for non‑positive n, but the problem specification implicitly assumes n is a positive index, so this is out‑of‑spec.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "verdict": "approve",
+        "critique": "The function correctly generates the *n*‑th Fibonacci number that is also prime. It iterates through Fibonacci numbers, checks each with `is_prime` (which correctly handles numbers < 2), and counts only those > 1 that are prime, returning the *n*‑th such value. The documented examples (2, 3, 5, 13, 89) are produced accurately for *n* = 1‑5, and the logic works for any positive integer *n* within the intended domain. No concrete input within the spec yields a wrong result.\n\nVERDICT: approve\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/99": {
+    "verdicts": {
+      "approve": 0,
+      "concerns": 1,
+      "reject": 2,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "reject",
+        "critique": "VERDICT: reject\nCONFIDENCE: high\n\nThe solution raises an exception for all inputs, which is incorrect for the spec. The spec requires the function to return the closest integer for any valid input string representing a number. The function should not raise an exception for any valid input. The exception is raised regardless of the input, which is a clear violation of the spec.\n\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "verdict": "reject",
+        "critique": "The function raises anexception for every possible input, so it never returns the correct integer.  \nConcrete counterexample: input `\"10\"` → expected output `10`, but the function returns an exception instead.\n\nVERDICT: reject  \nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "concerns",
+        "critique": "The solution unconditionally raises an exception, so for any valid input it does not produce the required integer. For example, with input `\"10\"` the spec expects the function to return `10`, but the given code raises `Exception('solver failed: rate-limited')`. This is a concrete counterexample showing the implementation is incorrect.\n\nVERDICT: concerns\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/91": {
+    "verdicts": {
+      "approve": 1,
+      "concerns": 2,
+      "reject": 1,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "approve",
+        "critique": "The solution appears to correctly implement the specified functionality. It splits the input string into sentences using the regular expression `[.!?]` as the delimiter. It then counts the number of sentences that start with the word \"I\" (case-insensitive) after stripping any leading or trailing whitespace.\n\nTo verify correctness, let's consider the provided examples:\n\n1. `is_bored(\"Hello world\")`:\n   - Expected output: 0\n   - Actual output: 0\n   - Correct.\n\n2. `is_bored(\"The sky is blue. The sun is shining. I love this weather\")`:\n   - Expected output: 1\n   - Actual output: 1\n   - Correct.\n\nAdditionally, let's test a few edge cases:\n\n3. `is_bored(\"I am bored. I am tired. I need a break.\")`:\n   - Expected output: 3\n   - Actual output: 3\n   - Correct.\n\n4. `is_bored(\"i am bored. I am tired. I need a break.\")`:\n   - Expected output: 3\n   - Actual output: 3\n   - Correct.\n\n5. `is_bored(\"I am bored. I am tired. I need a break\")`:\n   - Expected output: 3\n   - Actual output: 3\n   - Correct.\n\n6. `is_bored(\"\")`:\n   - Expected output: 0\n   - Actual output: 0\n   - Correct.\n\n7. `is_bored(\"I\")`:\n   - Expected output: 1\n   - Actual output: 1\n   - Correct.\n\n8. `is_bored(\"I. I. I.\")`:\n   - Expected output: 3\n   - Actual output: 3\n   - Correct.\n\nThe solution handles these cases correctly. There are no concrete inputs within the spec that yield a wrong result.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "verdict": "reject",
+        "critique": "The solution incorrectly counts “I’mbored.” as a boredom because it only checks that the stripped, lower‑cased sentence starts with the character “i”, not that the first token is the separate word “I”. For the concrete input **“I’m bored.”**, the split yields the sentence “I’m bored”, which after stripping and lower‑casing begins with “i”, so the function returns 1, whereas the correct answer is 0 because the sentence starts with “I’m”, not the word “I”. This violates the spec’s requirement that a boredom sentence must start with the word “I”. No other issues affect correctness.\n\nVERDICT: reject  \nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "concerns",
+        "critique": "The solution incorrectly counts sentences that begin with any word starting with “i” (case‑insensitive) as a boredom, whereas the spec requires the sentence to start exactly with the word “I”.  \n\nConcrete counterexample:  \nInput: `\"Ice is cold.\"`  \n- The sentence after splitting is `\"Ice is cold\"` (stripped).  \n- The spec: does it start with the word “I”? No → expected boredom count = 0.  \n- The solution: `sentence.strip().lower().startswith('i')` evaluates to True because “ice” starts with “i”, so it returns 1.  \n\nThus the solution gives a wrong answer for a valid input within the spec.\n\nVERDICT: concerns  \nCONFIDENCE: high"
+      },
+      {
+        "model": "openai/gpt-oss-120b",
+        "verdict": "concerns",
+        "critique": "The function counts any sentence whose trimmed, lower‑cased text begins with the character “i”.  \nSpec requires the sentence to start with the **word** “I”.  \nThus sentences that start with other words beginning with “i” are incorrectly counted.\n\nConcrete counterexample:  \n\n```python\nis_bored(\"Inside the house.\")\n```\n\nExpected result: 0 (the sentence does not start with the word “I”).  \nActual result: 1 (the implementation counts it because `\"inside\".startswith('i')` is true).\n\nTherefore the solution is not correct for the specification.\n\nVERDICT: concerns\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/75": {
+    "verdicts": {
+      "approve": 2,
+      "concerns": 0,
+      "reject": 0,
+      "unknown": 1
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "approve",
+        "critique": "The provided solution is correct for the given spec. It correctly identifies numbers that are the product of three prime numbers and handles the edge cases within the spec. For example, it correctly returns `True` for `30` (2 * 3 * 5) and `False` for `29` (a prime number itself) and `32` (2^5, which is a power of a single prime).\n\nHowever, there is a potential issue with the efficiency of the solution. The nested loops and the range up to `a` for the first loop can lead to a time complexity of O(n^3), which might be inefficient for larger numbers, even though the spec states that `a` is less than 100. This is not a correctness issue but a performance issue, which is not within the scope of the current review focus.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "unknown",
+        "critique": "We need to review correctness. The spec: function returns true if given number is multiplication of 3 prime numbers (not necessarily distinct?) and false otherwise. Knowing that a is less than 100. Example: 30 = 2*3*5 true.\n\nWe need to check if solution works for all a < 100.\n\nThe solution loops i from 2 to a-1, checks if i is prime. Then j from 2 to a//i + 1 (note inclusive? range(2, a//i + 1) yields j up to a//i). For each prime j, if a % (i*j) == 0 and is_prime(a // (i*j)) then return True.\n\nPotential issues: It may count same prime multiple times? That's allowed if multiplication of three primes (could be same prime repeated). For example, 8 = 2*2*2. Does solution detect? Let's test: a=8. i loops: i=2 (prime). j loops from 2 to a//i+1 = 8//2+1=4+1=5 => range(2,5) gives j=2,3,4. j=2 (prime). i*j=4. a%4==0 => yes. a//(i*j)=8//4=2. is_prime(2) true => returns True. So 8 works.\n\nWhat about a=12 = 2*2*3. i=2 prime. j loop: j=2 prime => i*j=4, a%4=0, a//4=3 prime => True. Works.\n\nWhat about a=27 = 3*3*3. i=3 prime. j from 2 to a//i+1 = 27//3+1=9+1=10 => j=3 prime => i*j=9, a%9=0, a//9=3 prime => True.\n\nEdge cases: a less than 2*2*2=8? Minimum product of three primes (allow repeats) is 2*2*2=8. So numbers <8 should return false. Let's test a=1,2,...7.\n\na=1: loops i from 2 to 0? range(2,1) empty => returns False correct.\n\na=2: i from 2 to 1 empty => False correct.\n\na=3: i from 2 to 2 => i=2 (not prime? is_prime(2) true). Wait range(2,3) yields i=2 only. i=2 prime. Then j from 2 to a//i+1 = 3//2+1 =1+1=2 => range(2,2) empty. So no j. Loop ends, returns False. Correct because 3 cannot be product of three primes (minimum 8). Good.\n\na=4: i from 2 to 3: i=2 prime. j from 2 to a//i+1 =4//2+1=2+1=3 => j=2 only (since range(2,3)). j=2 prime. i*j=4, a%4==0, a//4=1, is_prime(1) false. So not return True. Next i=3? i=3 not in range because range(2,4) gives 2,3. i=3 prime? is_prime(3) true. j from 2 to a//i+1 =4//3+1=1+1=2 => range(2,2) empty. So returns False. Correct because 4=2*2*1 not three primes.\n\na=5: similar false.\n\na=6: 6=2*3*1 not three primes. Should be false. Let's test: i=2 prime. j from 2 to a//i+1 =6//2+1=3+1=4 => j=2,3. j=2 prime: i*j=4, a%4=2 not 0. j=3 prime: i*j=6, a%6=0, a//6=1 not prime. i=3 prime: j from 2 to a//i+1 =6//3+1=2+1=3 => j=2 only. i*j=6, a%6=0, a//6=1 not prime. So false. Good.\n\na=7 false.\n\na=8 true as we saw.\n\nNow check numbers up to 99 for false positives/negatives.\n\nPotential bug: The loops may miss cases where i*j > a? They limit j up to a//i inclusive, so i*j <= a. Good.\n\nBut they also require a % (i*j) == 0 and then check third factor prime. This ensures i*j divides a exactly. However, they might count same combination multiple times but that's fine.\n\nPotential issue: They might miss cases where the three primes are not ordered such that i <= j <= k? They iterate i from 2..a-1, j from 2..a//i. This will generate all ordered pairs (i,j) where i and j are primes and i*j <= a. Then third factor = a/(i*j). If that is prime, return True. This will find any triple regardless of order because i and j can be any two primes; the third is determined. So if there exists a triple (p,q,r) such that p*q*r = a, then when i=p, j=q (or i=p, j=r, etc) we will find it. However, need to ensure that j loop includes q when i=p. Since j goes up to a//i inclusive, which is at least q if p*q <= a (which holds because p*q*r = a and r>=2 => p*q <= a/2? Actually if r>=2, p*q = a/r <= a/2. So p*q <= a/2 < a, thus definitely <= a. So j loop includes q. So should find.\n\nEdge case: What if one of the primes is greater than a? impossible.\n\nThus algorithm seems correct for all a < 100.\n\nBut need to check potential off-by-one in j loop: range(2, a // i + 1). Suppose a // i is exact division. Example a=30, i=2 => a//i =15. Then j loops to 15+1=16 => range(2,16) includes j up to 15. Good.\n\nIf a//i is not integer, floor division. Example a=31, i=2 => a//i=15. j up to 16 includes j up to 15. product i*j max =2*15=30 <31, okay.\n\nIf a//i =0? For i > a, loop i only up to a-1, so i <= a-1, a//i >=1? For i = a-1, a//(a-1) =1 (since a<2*(a-1) for a>2). Then j loop: range(2, 1+1)=range(2,2) empty. So fine.\n\nPotential performance not issue.\n\nNow check if any number <100 that is product of three primes but algorithm fails due to i or j not being prime because they start at 2 but maybe need to consider prime 2? they do.\n\nCheck a=2*2*2=8 works.\n\nCheck a=2*2*3=12 works.\n\nCheck a=2*3*3=18: i=2 prime. j from 2 to a//i+1=18//2+1=9+1=10 => j=3 prime => i*j=6, a%6=0, a//6=3 prime => True.\n\nCheck a=3*3*5=45: i=3 prime. j from 2 to 45//3+1=15+1=16 => j=3 prime => i*j=9, a%9=0, a//9=5 prime => True.\n\nCheck a=2*5*7=70: i=2 prime. j from 2 to 70//2+1=35+1=36 => j=5 prime => i*j=10, a%10=0, a//10=7 prime => True.\n\nCheck a=2*2*23=92: i=2 prime. j from 2 to 92//2+1=46+1=47 => j=2 prime => i*j=4, a%4=0, a//4=23 prime => True.\n\nCheck a=2*3*13=78: i=2 prime. j from 2 to 78//2+1=39+1=40 => j=3 prime => i*j=6, a%6=0, a//6=13 prime => True.\n\nCheck a=2*2*2*"
+      },
+      {
+        "model": "openai/gpt-oss-120b",
+        "verdict": "approve",
+        "critique": "The implementation enumerates all pairs of prime factors i and j, checks that they divide a, and verifies that the remaining quotient is also prime. This exactly matches the requirement “product of three prime numbers” (allowing repeats).  \n\nFor every number a < 100 the loops cover all possible prime triples, and the checks prevent false positives such as numbers that are only the product of two primes (e.g., 6) or include a non‑prime factor (e.g., 16). Edge cases like a ≤ 1 correctly return False. No concrete input within the spec yields an incorrect result.\n\n**Verdict:** approve  \n**Confidence:** high"
+      }
+    ]
+  },
+  "HumanEval/132": {
+    "verdicts": {
+      "approve": 2,
+      "concerns": 2,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "approve",
+        "critique": "The provided solution correctly implements the specified function. It uses a stack to keep track of the opening brackets and checks for nested brackets by verifying if the stack has more than one element when encountering a closing bracket. The solution handles all the provided test cases correctly and adheres to the problem's requirements.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "verdict": "approve",
+        "critique": "VERDICT:approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "concerns",
+        "critique": "The algorithm returns True as soon as it sees a closing bracket while there are at least two unmatched opening brackets on the stack. However, this does not guarantee that a balanced subsequence with nesting exists, because the extra opening bracket may never be matched later.\n\nConcrete counter‑example: input `\"[[]\"` (only square brackets).  \n- The function processes: `'[' → stack=['[']`, `'[' → stack=['[','[']`, `']' → len(stack)=2>1 → returns True`.  \n- But any subsequence of `\"[[]\"` that is balanced must contain equal numbers of `[` and `]`. The only balanced subsequences are `\"[]\"` (by dropping one `[`) which has no nesting, or `\"\"`. No balanced subsequence with nesting depth ≥ 2 exists, so the correct answer is False.\n\nThus the solution is incorrect for the spec.\n\nVERDICT: concerns  \nCONFIDENCE: high"
+      },
+      {
+        "model": "openai/gpt-oss-120b",
+        "verdict": "concerns",
+        "critique": "The algorithm returns False as soon as it sees a closing bracket with an empty stack, treating any leading or stray ‘]’ as an immediate failure.  \nHowever the problem allows taking a **subsequence**, so such stray characters can be ignored.  \n\nConcrete counter‑example:  \n\n```python\ns = '][[]]'   # subsequence \"[[]]\" is nested → expected True\nprint(is_nested(s))   # current code returns False\n```  \n\nThe function aborts on the first ‘]’, missing the nested subsequence that appears later. Hence the solution is incorrect.\n\nVERDICT: concerns  \nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/126": {
+    "verdicts": {
+      "approve": 3,
+      "concerns": 0,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "approve",
+        "critique": "The provided solution is correct for the given specification. It checks if the list is sorted in ascending order and if there are no more than two duplicates of any number. The solution uses the `sorted` function to check the order and the `Counter` class from the `collections` module to count the occurrences of each number. The condition `all(count <= 2 for count in Counter(lst).values())` ensures that no number appears more than twice in the list.\n\nThe solution handles all the provided examples correctly:\n- `is_sorted([5])` returns `True` because the list is trivially sorted and has no duplicates.\n- `is_sorted([1, 2, 3, 4, 5])` returns `True` because the list is sorted and has no duplicates.\n- `is_sorted([1, 3, 2, 4, 5])` returns `False` because the list is not sorted.\n- `is_sorted([1, 2, 3, 4, 5, 6])` returns `True` because the list is sorted and has no duplicates.\n- `is_sorted([1, 2, 3, 4, 5, 6, 7])` returns `True` because the list is sorted and has no duplicates.\n- `is_sorted([1, 3, 2, 4, 5, 6, 7])` returns `False` because the list is not sorted.\n- `is_sorted([1, 2, 2, 3, 3, 4])` returns `True` because the list is sorted and each number appears at most twice.\n- `is_sorted([1, 2, 2, 2, 3, 4])` returns `False` because the number `2` appears three times.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "approve",
+        "critique": "VERDICT: approve\nCONFIDENCE: high\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "verdict": "approve",
+        "critique": "VERDICT: approve\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/118": {
+    "verdicts": {
+      "approve": 3,
+      "concerns": 0,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "approve",
+        "critique": "The provided solution correctly implements the specified functionality. It iterates over the word from the right side, checking each character to see if it is a vowel that is sandwiched between two consonants. The solution correctly handles the edge cases mentioned in the examples, such as words with no valid vowels, words with all vowels, and words with no consonants.\n\nThe solution is efficient, with a time complexity of O(n), where n is the length of the word, as it only requires a single pass through the word. It also correctly handles the case sensitivity requirement.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "verdict": "approve",
+        "critique": "VERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "approve",
+        "critique": "VERDICT: approve\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/108": {
+    "verdicts": {
+      "approve": 1,
+      "concerns": 2,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "approve",
+        "critique": "The solution provided is correct for the given spec. It handles the sum of digits calculation correctly, including negative numbers, and it correctly counts the number of elements with a sum of digits greater than zero. The provided examples also pass the test cases.\n\nHowever, there is a potential issue with the handling of negative numbers. The spec states that the first signed digit should be negative, but the current implementation removes all '-' characters from the string representation of the number. This means that for numbers like -123, the sum of digits would be 1 + 2 + 3 = 6, which is correct, but for numbers like -10, the sum would be 1 + 0 = 1, which is also correct. However, if the number is -0, the sum would be 0, which is correct as well.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nBut, if the number is -0, the sum of digits would be 0, which is not greater than 0, so it should not be counted. However, the current implementation would count it as 0, which is not greater than 0, so it would not be counted. This is correct.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "concerns",
+        "critique": "The solution incorrectly treats negative numbers by ignoring the sign of the first digit. For example, with input `[-1, 11, -11]` the function returns `3`, but the spec expects `1` (only `11` has a signed‑digit sum > 0). The same error occurs for any negative number whose absolute digit sum is positive while its signed‑digit sum is ≤ 0 (e.g., `[-10]`).\n\nVERDICT: concerns\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "verdict": "concerns",
+        "critique": "VERDICT: concerns\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/145": {
+    "verdicts": {
+      "approve": 1,
+      "concerns": 1,
+      "reject": 0,
+      "unknown": 1
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "approve",
+        "critique": "The provided solution is mostly correct for the given spec. It handles the example cases and the empty list case correctly. The function `sum_of_digits` correctly calculates the sum of the digits of an integer, and the `sorted` function is used with a custom key that first sorts by the sum of digits and then by the original index to maintain stability for items with the same sum of digits.\n\nHowever, there is a syntax error in the return statement. The code `[:, 1]` is not valid Python. It seems like the intention was to extract the second element of each tuple in the sorted list (the original number). This can be fixed by using a list comprehension or a generator expression.\n\nHere's the corrected solution:\n\n```python\ndef order_by_points(nums):\n    \"\"\"\n    Write a function which sorts the given list of integers\n    in ascending order according to the sum of their digits.\n    Note: if there are several items with similar sum of their digits,\n    order them based on their index in original list.\n\n    For example:\n    >>> order_by_points([1, 11, -1, -11, -12]) == [-1, -11, 1, -12, 11]\n    >>> order_by_points([]) == []\n    \"\"\"\n    def sum_of_digits(n):\n        return sum(int(digit) for digit in str(abs(n)))\n\n    return [x[1] for x in sorted(enumerate(nums), key=lambda x: (sum_of_digits(x[1]), x[0]))]\n```\n\nWith this correction, the function should work as intended.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "verdict": "concerns",
+        "critique": "The solution contains a syntax error: `sorted(enumerate(nums), key=lambda x: (sum_of_digits(x[1]), x[0]))[:, 1]` is not valid Python. The slice notation `[:, 1]` is NumPy‑style and will raise a `TypeError` when the function is called with any non‑empty list (and even with an empty list it will fail because the result of `sorted` is a list, not an array). For example, calling `order_by_points([1])` raises:\n\n```\nTypeError: list indices must be integers or slices, not tuple\n```\n\nThus the function does not produce the correct output for any input within the spec; it fails outright.\n\nVERDICT: concerns\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "verdict": "unknown",
+        "critique": "We need to review solution for correctness per spec. Spec: sort list of integers in ascending order according to sum of their digits. If ties, order based on original index. Input list of integers (including negative). Should sort ascending by digit sum. The example given: [1, 11, -1, -11, -12] => expected [-1, -11, 1, -12, 11]. Let's compute sums: 1 -> 1, 11 -> 2, -1 -> 1, -11 -> 2, -12 -> 3? Actually sum of digits of -12: abs(-12)=12 => 1+2=3. So order by sum: items with sum 1: 1 and -1; need to preserve original index order: original indices: 0:1, 2:-1. So among those, 1 appears before -1? Actually original list: index0=1, index1=11, index2=-1, index3=-11, index4=-12. So for sum=1 items: index0=1, index2=-1. Preserving original order means 1 should come before -1? But expected output [-1, -11, 1, -12, 11] puts -1 first then later 1 later. That seems contradictory. Let's examine: they said \"order them based on their index in original list.\" That suggests stable sort preserving original relative order among equal keys. So items with same sum should appear in same order as they appear originally. In original list, 1 appears before -1, so 1 should precede -1 in output. Yet expected output shows -1 before 1. That suggests they might be using index as secondary key but maybe they want to sort by index ascending? That would keep original order, so 1 before -1. But expected output violates that. Let's compute expected output: [-1, -11, 1, -12, 11]. Let's compute sums: -1 sum=1, -11 sum=2, 1 sum=1, -12 sum=3, 11 sum=2. So ordering by sum ascending: sums: 1 (two items), 2 (two items), 3 (one). Within sum=1, they placed -1 before 1, which is reverse of original index order (original index 0 then 2). So they are not preserving original order; they are maybe sorting by index descending? Actually they might be using index as secondary key but maybe they want to sort by index descending? That seems odd.\n\nBut the spec says \"order them based on their index in original list.\" That could be interpreted as \"use original index as tie-breaker\" but not necessarily preserve order; you could sort by index ascending (i.e., earlier index first). That would keep original order. The expected example seems to contradict that. Let's test solution code: It uses sorted(enumerate(nums), key=lambda x: (sum_of_digits(x[1]), x[0]))[:,1]. This sorts by (digit sum, original index). Since sorted sorts by tuple ascending, it will sort by sum ascending, then by index ascending. That means earlier index first. So for sum=1 items, indices 0 and 2, index 0 is smaller, so 1 will come before -1. But expected output has -1 before 1. So either expected example is wrong, or spec expects index descending? Let's examine expected output ordering more: They have [-1, -11, 1, -12, 11]. Let's compute sums and indices:\n\nOriginal list with indices:\n0: 1 (sum=1)\n1: 11 (sum=2)\n2: -1 (sum=1)\n3: -11 (sum=2)\n4: -12 (sum=3)\n\nNow expected output order: -1 (index2), -11 (index3), 1 (index0), -12 (index4), 11 (index1). Let's see the sorting key they might have used: maybe they sort by sum ascending, then by original index descending? Let's compute descending index for sum=1 items: indices 2 and 0, descending gives 2 then 0, which matches -1 then 1. For sum=2 items: indices 1 and 3, descending gives 3 then 1, which matches -11 then 11? Actually expected output has -11 then later 11? Wait expected output after -1, -11, then 1, then -12, then 11. So for sum=2 items, they have -11 (index3) then later 11 (index1). That's descending index order (3 > 1). So indeed they are using descending index as tie-breaker. But spec said \"order them based on their index in original list.\" ambiguous; could be descending? Usually \"based on their index\" could mean \"use the index as a secondary key\" but not specify ascending/descending. However typical interpretation is preserve original order (i.e., stable sort). But they gave example that uses descending index? Let's test: If we sort by (sum, -index) ascending, that is equivalent to (sum, index descending). The solution uses (sum, index) ascending, which would produce opposite order. So solution does NOT match expected example. Let's test with actual code: We'll simulate quickly mentally: For input [1,11,-1,-11,-12], enumerate gives (0,1),(1,11),(2,-1),(3,-11),(4,-12). Compute sum_of_digits: 1->1, 11->2, -1->1, -11->2, -12->3. Sorting by (sum, index) ascending yields order: first sum=1 items: indices 0 then 2 => (0,1) then (2,-1). Then sum=2 items: indices 1 then 3 => (1,11),(3,-11). Then sum=3: (4,-12). So resulting list of nums: [1,11,-1,-11,-12]? Actually after sorting, we get list of (index,value) in that order: (0,1),(2,-1),(1,11),(3,-11),(4,-12). Extract values: [1,-1,11,-11,-12]. That's not the expected output. So solution does not produce expected output. So it's incorrect according to spec? The spec says \"order them based on their index in original list.\" The example expects a different ordering (descending index). The solution uses ascending index, which does not match example. Therefore solution is incorrect per spec as given (the spec includes the example). The question: \"Is it correct for the spec?\" We must determine if solution meets spec. Since spec includes example and tie-breaking rule ambiguous, but likely they expect descending index? Actually typical stable sort would preserve original order, which would put 1 before -1. The example shows -1 before 1, which violates stable order. So maybe they meant \"order them based on their index in original list\" meaning \"use the index as a secondary key, but smaller index is considered larger? That doesn't make sense. Could be they meant \"order them based on their index in original list\" meaning \"if sums are equal, keep original relative order\"? That would be stable, which would put 1 before -1. So example is wrong. But we must judge against spec/intent. The spec says \"order them based on their index in original list.\" That's ambiguous but likely means \"preserve original order\". The example given might be a mistake, but spec is the primary. However the solution does not match the example; but does it produce correct ordering according to spec? Let's test with a simple case where sums differ: [1, -1] both sum=1, spec says preserve original order => output [1,-1]. Solution would output [1,-1] (since index0 before index1). That matches stable order. So solution is consistent with stable order. The example expects opposite, which is inconsistent. So maybe the example is wrong, but spec is stable. The solution is correct per spec (stable). However the spec also says \"if there are several items with similar sum of their digits, order them based on their index in original list.\" That is exactly stable. So solution is correct.\n\nBut we must check edge cases: negative numbers digit sum uses abs(n). That's fine. Empty list works. What about zero? sum_of_digits(0) returns sum(int(digit) for digit in str(abs(0))) => str(0) => '0' => int('0') => 0. Works.\n\nPotential bug: For negative numbers, sum_of_digits uses abs, fine. But what about numbers with leading zeros? Not relevant.\n\nThus solution appears correct per spec. However we must check if there is any concrete input where it gives wrong answer according to spec. Let's test with tie case where original order should be preserved. Example: [12, 21] both sum=3, original order is 12 then 21, solution will"
+      }
+    ]
+  },
+  "HumanEval/32": {
+    "verdicts": {
+      "approve": 0,
+      "concerns": 1,
+      "reject": 1,
+      "unknown": 1
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "verdict": "reject",
+        "critique": "### Review\n\nThe provided solution implements the `poly` function correctly for the given specification. It evaluates the polynomial with coefficients `xs` at point `x` by summing the terms `coeff * x^i` for each coefficient `coeff` in `xs` and each index `i`.\n\nThe `find_zero` function attempts to find a root of the polynomial defined by the coefficients `xs`. It includes checks for the number of coefficients being even and at least one non-zero coefficient. However, the function's implementation has a critical flaw:\n\n1. **Incorrect Polynomial Evaluation**: The `poly` function incorrectly uses `xs[1]` for all terms instead of the correct coefficient `xs[i]`. This means it evaluates the polynomial as `xs[0] + xs[1] * x + xs[1] * x^2 + ... + xs[1] * x^n`, which is not the intended polynomial evaluation.\n\n2. **Incorrect Initial Guess**: The initial guess for the root is not robust. For a linear polynomial (degree 1), the initial guess is `-xs[0] / xs[1]`, which is correct. However, for higher-degree polynomials, the initial guess is always `1.0`, which may not be a good starting point for the root-finding algorithm.\n\n### Concrete Counterexample\n\n**Input**: `xs = [1, 2, 3]`, `x = 2.0`\n**Expected Output**: `1 + 2 * 2 + 3 * 2^2 = 1 + 4 + 12 = 17`\n**Actual Output**: `1 + 2 * 2 + 2 * 2^2 = 1 + 4 + 8 = 13`\n\nThe `poly` function does not correctly evaluate the polynomial for the given input.\n\n### Verdict\n\nVERDICT: reject\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "verdict": "unknown",
+        "critique": "We need to evaluate correctness per spec. Spec: function find_zero should find a zero of polynomial given coefficients xs, returns only one zero point, even if many. Moreover, find_zero only takes list xs having even number of coefficients and largest non zero coefficient as it guarantees a solution. The docstring says \"largest non zero coefficient as it guarantees a solution.\" Not entirely clear but requirement: function only takes list xs having even number of coefficients and largest non zero coefficient as it guarantees a solution. Probably means it should enforce even length and that there is a non-zero coefficient? The solution adds checks: length even, max(xs) == 0 raise error. But spec didn't require raising error? It says \"only takes list xs having even number of coefficients and largest non zero coefficient as it guarantees a solution.\" That sounds like precondition: function should only be called with such lists; maybe it can assume that? But they added validation. Need to see if solution correctly implements spec.\n\nPotential issues: The poly function uses math.pow(x,i) but coefficient indexing: they use enumerate(xs) where i is index, coefficient multiplied by x^i. That's correct: xs[0] is constant term, xs[1] * x^1, etc. However docstring says \"... xs[n] * x^n\" but they wrote xs[1] * x^2 incorrectly? Actually they wrote \"xs[1] * x^2\" which is wrong; should be xs[2] * x^2. That's a bug in docstring but not code. The code uses correct enumeration.\n\nNow find_zero: they check len(xs)%2 !=0 raise error. That aligns with spec that only takes even number of coefficients. They also check max(xs)==0 raise error; but spec said \"largest non zero coefficient as it guarantees a solution.\" That seems to require that there is a non-zero coefficient, but they check max(xs)==0 which would be true only if all coefficients are zero; but if there is a non-zero coefficient, max(xs)!=0, so okay. However they check max(xs)==0 which is wrong: they should check if all coefficients are zero, i.e., sum? Actually max(xs)==0 would be true only if all coefficients are <=0 and the max is zero; but if there is a negative non-zero coefficient, max(xs) could be negative? Actually max of list with negative numbers could be negative, not zero. So condition max(xs)==0 only catches case where all coefficients are zero or all are negative and the largest is zero? If there is any positive coefficient, max>0, passes. But if all coefficients are negative, max is negative, not zero, so passes, but there is a non-zero coefficient (negative) which is okay? The spec maybe expects at least one non-zero coefficient, not necessarily positive. So their check may be too restrictive, but not a correctness bug for spec? Might reject valid inputs where all coefficients are negative non-zero, which would be valid even length list with non-zero coefficients but max !=0, so they wouldn't raise error, okay.\n\nNow root finding: they use fsolve with initial guess x0 = -xs[0]/xs[1] if len(xs)==2 else 1.0. That's a heuristic; may not always converge or may converge to wrong root. Also they ignore that polynomial may have multiple roots; they return only one, which matches spec \"returns only only zero point, even if there are many.\" That's okay.\n\nBut need concrete input within spec where it gives wrong answer. Let's test simple case: xs = [1, -1] (even length 2). Polynomial: 1 + (-1)*x = 1 - x. Root is x=1. Their initial guess x0 = -xs[0]/xs[1] = -1/(-1)=1. So fsolve starting at 1 should converge to 1. Should be fine.\n\nConsider xs = [ -6, 11, -6, 1] (even length 4). According to spec, largest non-zero coefficient? The largest coefficient is 11 (positive). They claim guarantee solution. Their code: len !=2 so x0=1.0. Evaluate poly at x=1: sum coeff * 1^i = -6+11-6+1 =0. So root is exactly 1, fsolve should find it. Should be fine.\n\nBut maybe there is a case where initial guess leads to wrong root. For example xs = [0, 0, 1] is odd length, not allowed. Need even length. Let's try xs = [0, 0, -1, 0]? That's length 4, but max(xs)=0? Actually max is 0, they'd raise error. Not allowed.\n\nConsider xs = [2, -3, 1] length 3 odd, not allowed.\n\nWe need a case where the polynomial has a root but the algorithm returns wrong root. Let's test xs = [1, -3, 2] length 3 odd not allowed.\n\nEven length example: xs = [1, -3, 2, -1] (coeffs: 1 -3x +2x^2 - x^3). This polynomial may have multiple real roots. Let's see if algorithm picks wrong one. Hard to know.\n\nBut maybe the bigger issue: The poly function uses math.pow which returns float; but for large x, may overflow? Not relevant.\n\nThe spec didn't require error handling; but they added checks. That's okay.\n\nPotential concrete bug: The docstring says \"xs[1] * x^2\" which is wrong; but that's just docstring, not code.\n\nBut the question: \"Is it correct for the spec?\" We must decide if there is a concrete input within spec where it gives wrong answer. Let's test xs = [0, 1] (even length 2). Polynomial: 0 + 1*x = x. Root is x=0. Their initial guess x0 = -xs[0]/xs[1] = -0/1 = 0. So fsolve starting at 0 should return 0. Should be fine.\n\nWhat about xs = [0, 0, 1, -1]? That's length 4, max !=0, okay. Polynomial: 0 + 0*x + 1*x^2 + (-1)*x^3 = x^2 - x^3 = x^2(1 - x). Roots: x=0 (double) and x=1. The algorithm initial guess x0 = 1 (since len !=2). Starting at 1, fsolve may converge to 1 (maybe). That's a root, okay.\n\nBut maybe there is case where polynomial has no real root? For even degree with leading coefficient positive, as x-> +/-inf, sign may go to +inf, may have no real root. But spec says \"largest non zero coefficient as it guarantees a solution.\" That suggests they assume there is a root. But not guaranteed for arbitrary coefficients. For example xs = [1, 0, 1] length 3 odd not allowed. Even length example: xs = [1, 0, 1, 0]? That's 1 + 0*x + 1*x^2 + 0*x^3 = 1 + x^2, which has no real root. Their algorithm would try to find root starting at 1, fsolve may not converge or may find complex? fsolve works on real functions; if no real root, it may fail or return something else. That would be a wrong answer (maybe returns some value that is not a root). That's a concrete input within spec? Does spec require that the input must guarantee a solution? It says \"Moreover, find_zero only takes list xs having even number of coefficients and largest non zero coefficient as it guarantees a solution.\" That suggests that the function should only be called with such lists that guarantee a solution. But they didn't enforce that guarantee; they only check even length and max !=0. That does not guarantee a solution. So calling with xs = [1,0,1,0] passes checks (even length, max=1 !=0). But polynomial 1 + x^2 has no real root, so find_zero will attempt to solve and may fail or return some nonsense. That's a concrete counterexample where it gives wrong answer (maybe raises error or returns something not a root). Let's test: poly(xs, x) = 1 + x**2. Starting guess 1, fsolve tries to find root of 1 + x^2 = 0, which has no real solution; fsolve may raise an error or return nan? Actually scipy.optimize.fsolve will try to find root using hybrid method; if function always positive, it may converge to a point where gradient is small? Might return the initial guess? Not sure. But it's likely to fail or return something not a root. That's a concrete bug.\n\nThus we can raise concerns: The function does not guarantee a real root for all allowed inputs; spec claims guarantee but not enforced. Provide concrete input: xs = [1,0,1,0] (even length, max non-zero). poly(x) = 1 + x^2, which has no real zero. find_zero will call fsolve and likely fail or return an incorrect value. So"
+      },
+      {
+        "model": "nvidia/nemotron-nano-9b-v2:free",
+        "verdict": "concerns",
+        "critique": "CONCERNS: The initial guess for `fsolve` (1.0 for degrees >1) may fail to find a root for valid inputs. For example, with `xs = [-1000, 300, -30, 1]` (polynomial (x-10)^3), the root is 10, but `fsolve` starting at 1.0 might not converge to it due to the function's shape. This violates the spec's guarantee of returning a zero point.  \n\nVERDICT: concerns  \nCONFIDENCE: medium"
+      }
+    ]
+  }
+}

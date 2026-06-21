@@ -1,0 +1,50 @@
+{
+  "HumanEval/108": {
+    "pass": false,
+    "err": "AssertionError"
+  },
+  "HumanEval/132": {
+    "pass": false,
+    "err": "AssertionError"
+  },
+  "HumanEval/10": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/118": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/75": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/39": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/126": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/32": {
+    "pass": false,
+    "err": "TypeError: only 0-dimensional arrays can be converted to Python scalars"
+  },
+  "HumanEval/91": {
+    "pass": false,
+    "err": "AssertionError: Test 2"
+  },
+  "HumanEval/145": {
+    "pass": false,
+    "err": "TypeError: list indices must be integers or slices, not tuple"
+  },
+  "HumanEval/63": {
+    "pass": false,
+    "err": "Exception: solver failed: rate-limited"
+  },
+  "HumanEval/99": {
+    "pass": false,
+    "err": "Exception: solver failed: rate-limited"
+  }
+}

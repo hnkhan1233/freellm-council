@@ -1,0 +1,50 @@
+{
+  "HumanEval/10": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/118": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/91": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/63": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/75": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/108": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/126": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/132": {
+    "pass": false,
+    "err": "IndexError: pop from empty list"
+  },
+  "HumanEval/32": {
+    "pass": false,
+    "err": "ValueError: Failed to find a root for the given polynomial."
+  },
+  "HumanEval/99": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/39": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/145": {
+    "pass": false,
+    "err": "TypeError: list indices must be integers or slices, not tuple"
+  }
+}

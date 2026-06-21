@@ -1,0 +1,50 @@
+{
+  "HumanEval/2": {
+    "approve": 4,
+    "concerns": 0,
+    "reject": 0,
+    "unknown": 0
+  },
+  "HumanEval/118": {
+    "approve": 3,
+    "concerns": 1,
+    "reject": 0,
+    "unknown": 0
+  },
+  "HumanEval/108": {
+    "approve": 3,
+    "concerns": 0,
+    "reject": 0,
+    "unknown": 0
+  },
+  "HumanEval/99": {
+    "approve": 4,
+    "concerns": 0,
+    "reject": 0,
+    "unknown": 0
+  },
+  "HumanEval/145": {
+    "approve": 2,
+    "concerns": 0,
+    "reject": 0,
+    "unknown": 1
+  },
+  "HumanEval/126": {
+    "approve": 3,
+    "concerns": 0,
+    "reject": 0,
+    "unknown": 0
+  },
+  "HumanEval/32": {
+    "approve": 0,
+    "concerns": 1,
+    "reject": 0,
+    "unknown": 2
+  },
+  "HumanEval/132": {
+    "approve": 1,
+    "concerns": 0,
+    "reject": 0,
+    "unknown": 2
+  }
+}
