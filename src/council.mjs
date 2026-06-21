@@ -121,11 +121,12 @@ function pickDiverse(ranked, n) {
   return picked
 }
 
-const REVIEWER_SYSTEM = `You are an expert engineer serving on a review council. \
-Another engineer hands you their plan or code plus a question. Give a SHARP, CONCRETE critique:
-- Real bugs, risks, security holes, or missing cases — be specific, name the thing.
-- Anything wrong with the approach, and a better one if you have it.
-- Skip praise and generic advice. Brevity beats completeness; ~200 words max.
+const REVIEWER_SYSTEM = `You are an expert engineer on a review council. You are given a plan or code plus a question. \
+Be a rigorous SKEPTIC OF YOUR OWN CONCERNS — false alarms are costly and waste the team's time:
+- Only raise "concerns"/"reject" if you can point to something CONCRETE. For code, that means a SPECIFIC input that yields a wrong result — name the input and the wrong vs. expected output. For a plan, a specific scenario that breaks it. If you cannot produce a concrete counterexample, you must "approve".
+- Judge ONLY against the stated spec/intent. Do NOT invent out-of-spec problems (inputs the spec excludes, validation it never asked for, "what if None", hypotheticals you can't demonstrate). Those are not bugs.
+- If it is correct for the spec, say so plainly and approve. Approving correct work is the right answer, not a failure to find something.
+- Be specific and brief (~200 words).
 End with exactly two lines:
 VERDICT: approve | concerns | reject
 CONFIDENCE: low | medium | high`
@@ -188,6 +189,33 @@ async function askModel(model, question, context, { signal, focus } = {}) {
     }
   }
   return { ok: false, error: lastErr }
+}
+
+// Generic routed chat call to a single model (used by tooling/benchmarks that
+// need a solver, not a reviewer). Returns { ok, text } or { ok:false, error }.
+export async function chat(modelId, providerId, messages, { maxTokens = 1200, temperature = 0.2, timeoutMs = 60_000 } = {}) {
+  const r = route(providerId)
+  if (!r) return { ok: false, error: `no key for provider ${providerId}` }
+  const headers = { Authorization: `Bearer ${r.key}`, 'Content-Type': 'application/json' }
+  if (r.id === 'openrouter') { headers['HTTP-Referer'] = 'https://github.com/freellm-council'; headers['X-Title'] = 'FreeLLM Council' }
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
+  try {
+    for (let a = 0; a < 3; a++) {
+      const res = await fetch(`${r.baseUrl}/chat/completions`, {
+        method: 'POST', signal: ctrl.signal, headers,
+        body: JSON.stringify({ model: modelId, messages, temperature, max_tokens: maxTokens }),
+      })
+      if (res.status === 429 || res.status >= 500) { await sleep(1500 * (a + 1)); continue }
+      if (!res.ok) return { ok: false, error: `HTTP ${res.status}: ${(await res.text()).slice(0, 120)}` }
+      const data = await res.json()
+      const text = data?.choices?.[0]?.message?.content?.trim()
+      return text ? { ok: true, text } : { ok: false, error: 'empty' }
+    }
+    return { ok: false, error: 'rate-limited' }
+  } catch (e) {
+    return { ok: false, error: e?.name === 'AbortError' ? 'timeout' : String(e?.message || e) }
+  } finally { clearTimeout(timer) }
 }
 
 function parseVerdict(critique) {
