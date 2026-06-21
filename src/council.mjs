@@ -147,17 +147,19 @@ async function askModel(model, question, context, { signal, focus } = {}) {
   const headers = { Authorization: `Bearer ${r.key}`, 'Content-Type': 'application/json' }
   if (r.id === 'openrouter') { headers['HTTP-Referer'] = 'https://github.com/freellm-council'; headers['X-Title'] = 'FreeLLM Council' }
   const focusLine = focus ? `REVIEW FOCUS: ${focus}. Prioritize this, but still flag any other serious issue.\n\n` : ''
-  const body = {
-    model: model.id,
-    messages: [
-      { role: 'system', content: REVIEWER_SYSTEM },
-      { role: 'user', content: `${focusLine}QUESTION:\n${question}\n\nCONTEXT:\n${context}` },
-    ],
-    temperature: 0.4,
-    max_tokens: 900,
-  }
   let lastErr = 'unknown'
+  let ctxCap = Infinity // shrinks only if a model rejects the request as too large (size / TPM)
   for (let attempt = 0; attempt < 3; attempt++) {
+    const ctx = context.length > ctxCap ? context.slice(0, ctxCap) + '\n... [context truncated to fit this model]' : context
+    const body = {
+      model: model.id,
+      messages: [
+        { role: 'system', content: REVIEWER_SYSTEM },
+        { role: 'user', content: `${focusLine}QUESTION:\n${question}\n\nCONTEXT:\n${ctx}` },
+      ],
+      temperature: 0.4,
+      max_tokens: 2000, // headroom so verbose reasoning models still reach their VERDICT line
+    }
     try {
       const res = await fetch(`${r.baseUrl}/chat/completions`, { method: 'POST', signal, headers, body: JSON.stringify(body) })
       if (res.status === 429 || res.status >= 500) {
@@ -165,7 +167,16 @@ async function askModel(model, question, context, { signal, focus } = {}) {
         lastErr = `HTTP ${res.status}`
         await sleep((ra ? ra * 1000 : 0) + 1500 * (attempt + 1)); continue
       }
-      if (!res.ok) return { ok: false, error: `HTTP ${res.status}: ${(await res.text()).slice(0, 160)}` }
+      if (!res.ok) {
+        const t = await res.text()
+        // Too-large (per-request size or tokens-per-minute) → shrink context and retry, don't drop the model.
+        if (res.status === 413 || /too large|context[_ ]length|maximum context|tokens per minute/i.test(t)) {
+          ctxCap = ctxCap === Infinity ? 8000 : Math.max(2000, Math.floor(ctxCap / 2))
+          lastErr = `HTTP ${res.status} (too large → retry with ${ctxCap} chars)`
+          continue
+        }
+        return { ok: false, error: `HTTP ${res.status}: ${t.slice(0, 160)}` }
+      }
       const data = await res.json()
       const text = data?.choices?.[0]?.message?.content?.trim()
       if (!text) { lastErr = 'empty response'; await sleep(1200); continue }
