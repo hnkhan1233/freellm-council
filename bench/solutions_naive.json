@@ -1,0 +1,10 @@
+{
+  "HumanEval/2": "def truncate_number(number: float) -> float:\n    return number % 1.0\n",
+  "HumanEval/32": "import math\n\ndef poly(xs: list, x: float):\n    return sum([coeff * math.pow(x, i) for i, coeff in enumerate(xs)])\n\ndef find_zero(xs: list):\n    begin, end = -1.0, 1.0\n    while poly(xs, begin) * poly(xs, end) > 0:\n        begin *= 2.0\n        end *= 2.0\n    while end - begin > 1e-10:\n        center = (begin + end) / 2.0\n        if poly(xs, begin) * poly(xs, center) > 0:\n            begin = center\n        else:\n            end = center\n    return begin\n",
+  "HumanEval/99": "from math import floor, ceil\n\ndef closest_integer(value):\n    num = float(value)\n    if num >= 0:\n        return floor(num + 0.5)\n    else:\n        return ceil(num - 0.5)\n",
+  "HumanEval/108": "def count_nums(arr):\n    def ds(n):\n        digits = [int(c) for c in str(abs(n))]\n        if n < 0:\n            digits[0] = -digits[0]\n        return sum(digits)\n    return sum(1 for n in arr if ds(n) > 0)\n",
+  "HumanEval/118": "def get_closest_vowel(word):\n    vowels = 'aeiouAEIOU'\n    for i in range(len(word) - 2, 0, -1):\n        if word[i] in vowels and word[i-1] not in vowels and word[i+1] not in vowels:\n            return word[i]\n    return ''\n",
+  "HumanEval/126": "from collections import Counter\n\ndef is_sorted(lst):\n    if any(v > 2 for v in Counter(lst).values()):\n        return False\n    return all(lst[i] <= lst[i+1] for i in range(len(lst) - 1))\n",
+  "HumanEval/132": "def is_nested(string):\n    opening = [i for i, c in enumerate(string) if c == '[']\n    closing = [i for i, c in enumerate(string) if c == ']']\n    closing.reverse()\n    cnt = 0\n    i = 0\n    l = len(closing)\n    for idx in opening:\n        if i < l and idx < closing[i]:\n            cnt += 1\n            i += 1\n    return cnt >= 1\n",
+  "HumanEval/145": "def order_by_points(nums):\n    def ds(n):\n        return sum(int(c) for c in str(abs(n)))\n    return sorted(nums, key=ds)\n"
+}

@@ -2,3 +2,7 @@ node_modules/
 .env
 *.log
 .DS_Store
+
+# benchmark dataset (fetched, large) — pilot subset is committed
+bench/HumanEval.jsonl
+bench/HumanEval.jsonl.gz

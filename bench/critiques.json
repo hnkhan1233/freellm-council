@@ -1,0 +1,266 @@
+{
+  "HumanEval/2": {
+    "answered": 3,
+    "asked": 4,
+    "verdicts": {
+      "approve": 1,
+      "concerns": 2,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "provider": "mistral",
+        "verdict": "concerns",
+        "confidence": "high",
+        "critique": "### Critique\n\nThe proposed solution uses the modulus operator (`%`) to return the decimal part of a number. This approach is mathematically correct for positive numbers, as it returns the remainder after division by 1.0, which is exactly the decimal part.\n\nHowever, the solution does not handle negative numbers correctly. For example, `truncate_number(-3.5)` would return `0.5`, but the expected result should be `-0.5` to maintain consistency with the integer part. This is a critical bug.\n\nAdditionally, the solution does not handle non-float inputs, such as integers or strings, which could lead to unexpected behavior or errors. The function should include type checking or validation to ensure the input is a float.\n\n### Verdict\nVERDICT: concerns\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "provider": "openrouter",
+        "verdict": "approve",
+        "confidence": "high",
+        "critique": "VERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "provider": "groq",
+        "verdict": "concerns",
+        "confidence": "high",
+        "critique": "The proposed solution is mostly correct but has a flaw. The issue arises when the input `number` is not a positive floating-point number, which is a requirement according to the problem statement.\n\nThe bug is that the solution does not handle negative numbers or non-numeric inputs. Specifically, for negative numbers, the function will return a negative decimal part, which is incorrect according to the spec. \n\nFor example, `truncate_number(-3.5)` returns `-0.5`, but it should either raise an error or handle it in a specified way.\n\nAnother potential issue is that the function does not handle non-numeric inputs. For instance, `truncate_number(\"hello\")` will raise a TypeError.\n\nA better approach would be to add input validation to ensure that the input is a positive number.\n\nHere's a suggested fix:\n\n```python\ndef truncate_number(number: float) -> float:\n    if not isinstance(number, (int, float)) or number <= 0:\n        raise ValueError(\"Input must be a positive number\")\n    return number % 1.0\n```\n\nVERDICT: concerns\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/32": {
+    "answered": 3,
+    "asked": 4,
+    "verdicts": {
+      "approve": 0,
+      "concerns": 3,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "provider": "mistral",
+        "verdict": "concerns",
+        "confidence": "medium",
+        "critique": "### Critique:\n\n1. **Bug**: The `poly` function incorrectly implements the polynomial evaluation. It should be `xs[0] + xs[1] * x + xs[2] * x^2 + ... + xs[n] * x^n`, but the current implementation uses `xs[1]` for both the linear and quadratic terms.\n\n2. **Edge Case**: The `find_zero` function assumes the polynomial has a root within the initial interval `[-1.0, 1.0]`. This may not hold for all polynomials, especially those with roots outside this range.\n\n3. **Error Handling**: The function does not handle cases where the polynomial does not have a root, or where the initial interval does not contain a root. This could lead to infinite loops or incorrect results.\n\n4. **Approach**: The bisection method used in `find_zero` is correct but may not be the most efficient for all cases. For polynomials, Newton's method or other root-finding algorithms might be more suitable.\n\n5. **Input Validation**: The function does not validate the input list `xs` to ensure it has an even number of coefficients or that the largest non-zero coefficient is non-zero, as specified in the docstring.\n\n### Verdict:\nVERDICT: concerns\nCONFIDENCE: medium"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "provider": "openrouter",
+        "verdict": "concerns",
+        "confidence": "medium",
+        "critique": "The code correctly computespoly for any numeric x and non‑empty xs, but it fails on several critical cases required by the specification.\n\n1. **No guarantee of a root** – The spec says xs must have an even number of coefficients and a “largest non‑zero coefficient” that guarantees a solution. `find_zero` never checks the length of xs or the magnitude of its coefficients, so it may be called with an odd‑length list or a polynomial that has no real root. In such cases the initial interval [-1, 1] never brackets a sign change, the while‑loop never terminates, and the function hangs (infinite loop).\n\n2. **Infinite loop on monotone polynomials** – For polynomials that keep the same sign on [-1, 1] (e.g., xs = [1, 2] → 1 + 2x > 0 for all x ≥ ‑1), the condition `poly(xs, begin) * poly(xs, end) > 0` remains true forever as `begin` and `end` are doubled, causing an endless expansion.\n\n3. **Endpoint root handling** – If the true root lies exactly at ‑1 or 1, the algorithm may exit the bisection loop without ever evaluating the endpoint, returning a value that is not a root within the required tolerance.\n\n4. **Numerical stability** – Using `math.pow(x, i)` for large i can overflow or lose precision; a simple `x**i` or Horner’s method would be safer.\n\nBecause the core requirement—finding a zero for *any* valid polynomial—is not satisfied, the implementation is fundamentally incorrect.\n\nVERDICT: concerns  \nCONFIDENCE: medium"
+      },
+      {
+        "model": "openai/gpt-oss-120b",
+        "provider": "groq",
+        "verdict": "concerns",
+        "confidence": "high",
+        "critique": "**Bugs / Missing Cases**\n\n1. **Even‑multiplicity root** – The algorithm relies on a sign change between `begin` and `end`. If the real root has even multiplicity (the polynomial touches the axis without crossing), `poly(begin)` and `poly(end)` keep the same sign, so the outer `while` never terminates and the binary search never converges to the root. Example: `xs = [2, -3, 1, 0]` (polynomial = x³ − 3x² + 2x) has a double root at x = 0, but the code loops forever.\n\n2. **Infinite expansion** – If the polynomial truly has no real root (contrary to the “guaranteed solution” claim) the first `while poly(begin)*poly(end) > 0:` will double the interval without bound, eventually causing overflow or a long hang.\n\n3. **Zero at interval endpoint** – When `poly(begin) == 0` the product is zero, the outer loop exits, but the subsequent binary search still treats the interval as if a sign change exists, potentially discarding the exact root and returning a value ≈ `begin` with error up to `1e-10`.\n\n4. **Input validation missing** – No checks for:\n   * empty `xs`\n   * non‑even length (spec requires even number of coefficients)\n   * leading coefficient zero (which would break the “largest non‑zero coefficient guarantees a solution” assumption)\n\n5. **Return value** – Returns `begin` instead of the midpoint; after the loop `begin` may be up to `1e-10` away from the true root, which is acceptable for tolerance but inconsistent with typical bisection implementations that return the midpoint.\n\n**Approach flaw** – Using sign‑change bisection cannot locate roots of even multiplicity. A robust alternative is to apply a root‑finding method that does not depend on sign change, e.g., Newton‑Raphson with fallback to Brent’s method, or to first factor out known multiplicities via derivative checks.\n\n---\n\nVERDICT: concerns  \nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/99": {
+    "answered": 3,
+    "asked": 4,
+    "verdicts": {
+      "approve": 1,
+      "concerns": 2,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "provider": "mistral",
+        "verdict": "concerns",
+        "confidence": "high",
+        "critique": "### Critique:\n\n1. **Bug**: The solution fails to handle the case where the input is equidistant from two integers. For example, `closest_integer(\"14.5\")` should return 15, but the current implementation returns 14. Similarly, `closest_integer(\"-14.5\")` should return -15, but it returns -14.\n\n2. **Edge Case**: The solution does not handle non-numeric strings. For example, `closest_integer(\"abc\")` will raise a `ValueError`.\n\n3. **Error Handling**: The solution lacks error handling for invalid inputs, such as non-numeric strings or strings that cannot be converted to a float.\n\n4. **Approach**: The current approach uses `floor` and `ceil` with a fixed offset of 0.5, which is not a robust way to handle rounding. A better approach would be to use the built-in `round` function, which already handles rounding away from zero for equidistant cases.\n\n### Improved Solution:\n```python\ndef closest_integer(value):\n    try:\n        num = float(value)\n        return round(num)\n    except ValueError:\n        raise ValueError(\"Input must be a numeric string\")\n```\n\nVERDICT: concerns\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "provider": "openrouter",
+        "verdict": "concerns",
+        "confidence": "medium",
+        "critique": "The algorithm correctly rounds to the nearest integer for typical finite numbers, using `floor(num+0.5)` for non‑negative values and `ceil(num‑0.5)` for negatives, which implements “round‑away‑from‑zero” for exact halves.\n\n**Bugs / risks**\n1. **Precision loss for large magnitudes** – When `num` is a huge float (e.g., ≥ 1e16), adding 0.5 may be rounded to the same value, so `floor(num+0.5)` never increments for a true .5 fraction. Example: `\"1e20+0.5\"` becomes `1e20` after conversion, and the function returns `1e20` instead of the required `1e20+1`.\n2. **Invalid input** – `float(value)` raises `ValueError` for non‑numeric strings and `OverflowError`/`ValueError` for `inf` or `nan`. No validation or graceful handling is provided.\n3. **Zero handling** – While mathematically correct, the explicit `if num >= 0` branch is unnecessary; a single expression `round(num)` with `int(num + (0.5 if num >= 0 else -0.5))` would be clearer and avoids the separate `ceil` call.\n\n**Better approach**  \nUse Python’s built‑in `round` with the required tie‑breaking rule: `int(round(num))` does not satisfy “away from zero” for negatives, so implement:\n```python\ndef closest_integer(value):\n    try:\n        num = float(value)\n    except (ValueError, TypeError):\n        raise ValueError(\"input must be a numeric string\")\n    if num >= 0:\n        return int(num + 0.5)  # floor equivalent for positive\n    else:\n        return int(num - 0.5)  # ceil equivalent for negative\n```\nThis still suffers from the large‑magnitude precision issue; a robust solution would use Decimal for exact arithmetic.\n\nVERDICT: concerns  \nCONFIDENCE: medium"
+      },
+      {
+        "model": "qwen/qwen3-32b",
+        "provider": "groq",
+        "verdict": "approve",
+        "confidence": "high",
+        "critique": "<think>\nOkay, let's see. The problem is to write a function that takes a string representing a number and returns the closest integer. If it's exactly halfway between two integers, round away from zero. The proposed solution uses math.floor and math.ceil with some adjustments.\n\nFirst, the solution converts the input string to a float. That's straightforward. Then, for non-negative numbers, it adds 0.5 and floors. For negative numbers, subtracts 0.5 and ceils. Let me test some examples.\n\nTake \"14.5\". It's positive. Adding 0.5 gives 14.5 + 0.5 = 15.0, floor is 15. Correct. For \"-14.5\", it's negative. Subtract 0.5: -14.5 - 0.5 = -15.0, ceil of that is -15. Correct. What about something like 2.3? 2.3 + 0.5 = 2.8, floor is 2. Correct. 2.6 becomes 3.2, floor 3. Correct.\n\nWait, what about numbers that are already integers? Like \"10\". Convert to 10.0. Adding 0.5 is 10.5, floor is 10. Correct. What about a negative non-halfway case, like \"-15.3\"? Convert to -15.3. Subtract 0.5 is -15.8. Ceil(-15.8) is -15, which is correct since -15.3 is closer to -15 than -16.\n\nNow check edge cases. What about \"0.5\"? It's positive. 0.5 + 0.5 = 1.0, floor is 1. Correct. \"-0.5\" would be -0.5 -0.5 = -1.0, ceil is -1.0 → -1. Correct. What about very small numbers like \"0.0\"? Returns 0, correct.\n\nAnother edge case: \"-0.0\"? Well, in Python, \"-0.0\" as a float is 0.0, but when you process it, the code checks if num >=0. So for \"-0.5\", it would be negative. But \"-0.0\" would be treated as positive, so returns floor(-0.0 + 0.5) → floor(0.5) is 0. Which is correct.\n\nWhat about numbers that are exactly halfway but with more decimal points? Like \"14.5000000001\"? The code would handle it correctly. But the problem states that it's exactly halfway. So the code seems to handle that.\n\nWait, but what if the input is something like \"inf\" or \"-inf\"? The problem says the input is a string representing a number, but if the code is given those, it would convert to float, but the function's examples don't cover that. However, the problem's note doesn't mention handling infinities. Since the problem examples don't cover that, maybe it's not required. The code would handle them by returning inf or -inf, but that's probably beyond the problem's scope. But the problem says \"number\", so maybe those are not considered.\n\nAnother possible issue: very large numbers that when added 0.5 could cause floating-point inaccuracies. For example, numbers so large that adding 0.5 doesn't change them due to floating-point precision. But converting a string to float in Python can handle large numbers accurately up to certain points. However, if the input is a very large string, converting to float might lose precision. For example, a very long decimal string. But the problem's examples don't mention handling such cases, and the function uses float, which may not be precise for very large numbers. But the problem's spec doesn't mention handling such edge cases, so maybe it's acceptable.\n\nSo, in terms of correctness for the given problem statement, the code seems to handle all the required cases. The approach of using floor(num + 0.5) for non-negative and ceil(num - 0.5) for negative numbers correctly rounds away from zero when equidistant. The code passes the examples given and handles other cases correctly.\n</think>\n\nThe proposed solution is correct for all cases in the spec, including edge cases. The approach uses `floor(num + 0.5)` for non-negative numbers and `ceil(num - 0.5)` for negatives, which correctly rounds away from zero when equidistant (e.g., `14.5` → `15`, `-14.5` → `-15`). \n\nKey edge cases are handled:\n- Integer inputs like `\"10\"` return `10` (no rounding needed).\n- Midpoint values like `\"0.5\"` and `\"-0.5\"` round away from zero.\n- Negative non-midpoint values like `\"-15.3\"` round to `-15`.\n\nNo bugs are present in the logic. However, **floating-point precision errors** could theoretically affect very large or precise numbers (e.g., `\"1e30\"`), but this is beyond the problem’s scope. The spec does not require handling such cases, so it’s acceptable.\n\nVERDICT: approve  \nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/108": {
+    "answered": 3,
+    "asked": 4,
+    "verdicts": {
+      "approve": 1,
+      "concerns": 2,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "provider": "mistral",
+        "verdict": "concerns",
+        "confidence": "medium",
+        "critique": "**CRITIQUE:**\n\n1. **Bug**: The function fails to handle the case where `arr` is `None`. It will raise a `TypeError` because `None` is not iterable.\n\n2. **Edge Case**: The function does not handle the case where an element in `arr` is `0`. According to the spec, the sum of digits of `0` is `0`, which should not be counted. However, the current implementation will count `0` because `ds(0)` returns `0`, and `0 > 0` is `False`.\n\n3. **Error Handling**: The function does not handle non-integer elements in `arr`. It will raise a `ValueError` when trying to convert a non-integer element to a string.\n\n4. **Approach**: The current approach is correct for the given spec, but it can be made more efficient by avoiding the conversion of the number to a string and back to an integer. Instead, you can use arithmetic operations to extract the digits.\n\n**VERDICT: concerns**\n**CONFIDENCE: medium**"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "provider": "openrouter",
+        "verdict": "approve",
+        "confidence": "high",
+        "critique": "Theimplementation correctly computes the signed digit sum for all integers, including negatives, by negating only the first digit of `abs(n)`. It handles the empty list, zero, and single‑digit negatives as required, matching the provided examples. No off‑by‑one or sign errors are present, and the `sum(1 for …)` filter accurately counts elements with a positive digit sum. No other serious issues (e.g., type errors, performance problems) are evident.\n\nVERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "provider": "groq",
+        "verdict": "concerns",
+        "confidence": "medium",
+        "critique": "The solution appears to be mostly correct but has a subtle issue. The problem statement defines the signed digits for negative numbers, but the solution does not handle the case where the sum of digits is exactly 0 correctly for all inputs.\n\nSpecifically, the solution will incorrectly count numbers with a sum of digits equal to 0. For instance, the number 0 itself has a sum of digits equal to 0.\n\nHowever, there's another edge case: the input array may contain non-integer values. The problem statement does not specify how to handle such cases, but it's essential to consider them.\n\nThe function `ds(n)` correctly calculates the sum of signed digits for both positive and negative numbers.\n\nTo fix the potential issue, we can add a check to ensure that the input array only contains integers.\n\nHere's a suggested improvement:\n\n```python\ndef count_nums(arr):\n    def ds(n):\n        digits = [int(c) for c in str(abs(n))]\n        if n < 0:\n            digits[0] = -digits[0]\n        return sum(digits)\n    return sum(1 for n in arr if isinstance(n, int) and ds(n) > 0)\n```\n\nVERDICT: concerns\nCONFIDENCE: medium"
+      }
+    ]
+  },
+  "HumanEval/118": {
+    "answered": 3,
+    "asked": 5,
+    "verdicts": {
+      "approve": 2,
+      "concerns": 1,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "provider": "mistral",
+        "verdict": "approve",
+        "confidence": "high",
+        "critique": "**CRITIQUE:**\n\n1. **Edge Case Missed**: The solution doesn't handle words with fewer than 3 characters. For example, `get_closest_vowel(\"ab\")` should return `\"\"`, but the loop won't execute, and it will return `\"\"` correctly. However, the problem states to assume the input contains English letters only, but doesn't specify the minimum length. The solution is correct for the given examples, but it's worth noting the implicit assumption about the input length.\n\n2. **Case Sensitivity**: The solution correctly handles case sensitivity as per the spec, but it's worth noting that the spec explicitly mentions case sensitivity, and the solution adheres to it.\n\n3. **Vowel Identification**: The solution correctly identifies vowels using the `vowels` string, which includes both lowercase and uppercase vowels.\n\n4. **Loop Logic**: The loop starts from `len(word) - 2` and goes down to `1`, which is correct for finding a vowel between two consonants. However, the loop condition `i > 0` is redundant because the loop will stop when `i` reaches `1`.\n\n5. **Return Value**: The solution correctly returns the first vowel found that meets the condition, and an empty string if no such vowel is found.\n\n**VERDICT:** approve\n**CONFIDENCE:** high"
+      },
+      {
+        "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+        "provider": "groq",
+        "verdict": "concerns",
+        "confidence": "high",
+        "critique": "The solution provided seems mostly correct but has a few issues. \n\nThe loop starts from `len(word) - 2` and ends at `1`, which correctly avoids checking the first and last characters of the word as per the problem statement. However, it does not handle the case when the input word has a length of less than 3. \n\nIn such cases, the function should return an empty string because there can't be a vowel between two consonants. The current implementation does not explicitly handle this edge case but it works because the loop condition `range(len(word) - 2, 0, -1)` will be empty when `len(word) < 3`, resulting in the function returning an empty string.\n\nHowever, to make the code more robust and clear, it would be better to add an explicit check at the beginning of the function.\n\nHere's a slightly improved version:\n\n```python\ndef get_closest_vowel(word):\n    if len(word) < 3:\n        return ''\n\n    vowels = 'aeiouAEIOU'\n    for i in range(len(word) - 2, 0, -1):\n        if word[i] in vowels and word[i-1] not in vowels and word[i+1] not in vowels:\n            return word[i]\n    return ''\n```\n\nVERDICT: concerns\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "provider": "openrouter",
+        "verdict": "approve",
+        "confidence": "high",
+        "critique": "We need to review correctness, edge cases, error handling. The function: iterates i from len(word)-2 down to 1 inclusive? Actually range(start, stop, step): start = len(word)-2, stop = 0 (exclusive), step = -1. So i goes len(word)-2, len(word)-3, ..., 1. It checks if word[i] is vowel and both neighbors not vowels. Returns first found from right side (closest vowel from right). That matches spec: find closest vowel that stands between two consonants from the right side of the word. Vowels at beginning and ending don't count (so we ignore i=0 and i=len(word)-1). The loop excludes i=0 and i=len(word)-1 because start is len(word)-2 and stop is 0 exclusive, so i never reaches 0 or len(word)-1. Good.\n\nEdge cases: word length less than 3? For len(word) < 3, range(len(word)-2,0,-1) yields start negative? Let's test: len=2 => start=0, stop=0, step=-1 => range(0,0,-1) yields empty (since start equals stop). So loop does nothing, returns '' correct. len=1 => start=-1, stop=0, step=-1 => range(-1,0,-1) yields -1? Actually range(-1,0,-1) includes -1 only? Let's think: start=-1, stop=0, step=-1: we go -1, then -2,... but stop is 0 exclusive, stepping negative, we stop when current <= stop? Actually range with negative step continues while i > stop. So i=-1 >0? No, -1 >0 is false, so empty. So returns '' correct. len=0 => start=-2, stop=0, step=-1 => i=-2 >0? false, empty. So returns ''.\n\nNow check case sensitivity: vowels includes both cases, and we compare directly, so case-sensitive works.\n\nPotential bug: The spec says \"closest vowel that stands between two consonants from the right side of the word\". Means we need a vowel that has a consonant on both sides (immediate left and right). The code checks word[i-1] not in vowels and word[i+1] not in vowels. That's correct for consonants? But what about letters that are not vowels but could be non-letter? Spec says only English letters, so fine.\n\nEdge case: What about 'y'? Sometimes considered vowel but spec says vowels are a e i o u (both cases). So 'y' is consonant. Good.\n\nNow test examples: \"yogurt\": letters y o g u r t. Indices:0 y,1 o,2 g,3 u,4 r,5 t. Loop i from len-2=4 down to1: i=4 char 'r' not vowel; i=3 char 'u' vowel, check neighbors: word[2]='g' not vowel, word[4]='r' not vowel => return 'u'. correct.\n\n\"FULL\": F U L L. indices 0F,1U,2L,3L. len=4 => start=2, stop=0 step -1 => i=2 char 'L' not vowel; i=1 char 'U' vowel, neighbors: word[0]='F' not vowel, word[2]='L' not vowel => return 'U'. correct.\n\n\"quick\": q u i c k. indices 0q,1u,2i,3c,4k. len=5 => start=3, stop=0 step -1 => i=3 char 'c' not vowel; i=2 char 'i' vowel, neighbors: word[1]='u' vowel => fails; i=1 char 'u' vowel, neighbors: word[0]='q' not vowel, word[2]='i' vowel => fails. Return '' correct.\n\n\"ab\": len=2 => start=0 stop=0 => empty => '' correct.\n\nEdge: \"a\": len=1 => '' correct.\n\nEdge: \"aba\": a b a. indices 0a,1b,2a. len=3 => start=1, stop=0 step -1 => i=1 char 'b' not vowel => return '' correct because vowel at ends not count.\n\nEdge: \"bab\": b a b. i=1 char 'a' vowel, neighbors both 'b' not vowel => return 'a'. That's correct: closest vowel from right side (only one) between consonants.\n\nEdge: \"bAb\": b A b. 'A' vowel uppercase, neighbors not vowel => return 'A'. Works.\n\nEdge: \"bb\": len=2 => ''.\n\nEdge: \"bbb\": len=3 => i=1 char 'b' not vowel => ''.\n\nEdge: \"bAbC\": b A b C. len=4 => start=2, stop=0 step -1 => i=2 char 'b' not vowel; i=1 char 'A' vowel, neighbors: word[0]='b' not vowel, word[2]='b' not vowel => return 'A'. That's the closest from right? Actually there is only one vowel. Good.\n\nEdge: multiple vowels: \"cArOt\": c A r O t. indices 0c,1A,2r,3O,4t. len=5 => start=3, stop=0 step -1 => i=3 char 'O' vowel, neighbors: word[2]='r' not vowel, word[4]='t' not vowel => return 'O' (closest from right). That's correct.\n\nEdge: \"cArOtx\": c A r O t x. len=6 => start=4, stop=0 step -1 => i=4 char 't' not vowel; i=3 char 'O' vowel, neighbors word[2]='r' not vowel, word[4]='t' not vowel => return 'O'. Good.\n\nEdge: \"cArOtxY\": c A r O t x Y. len=7 => start=5, stop=0 step -1 => i=5 char 'x' not vowel; i=4 char 't' not vowel; i=3 char 'O' vowel, neighbors word[2]='r' not vowel, word[4]='t' not vowel => return 'O'. Good.\n\nEdge: \"cArOtxYz\": similar.\n\nNow check scenario where vowel is between consonants but left neighbor is vowel? Not counted.\n\nNow check scenario where there is vowel between consonants but also another vowel further right that also meets condition? We need closest from right side, i.e., the rightmost vowel meeting condition. Our loop iterates from right to left (starting at len-2 down to 1) and returns first match, which is the rightmost. Good.\n\nNow check scenario where there is a vowel at position len-2 (second last) that meets condition? Example: word length 3, vowel at index1 (middle). That's allowed. Loop start = len-2 =1, includes i=1. Good.\n\nNow check scenario where vowel at index len-2 but right neighbor is at len-1 (last char) which must be consonant. That's fine.\n\nNow check scenario where vowel at index 1 (second char) and left neighbor index0 must be consonant. Loop includes i=1 because stop exclusive 0, step -1 includes 1. Good.\n\nNow check scenario where word length exactly 2: no possible vowel between consonants because need both sides. Loop empty => correct.\n\nNow check scenario where word length exactly 3 and vowel at index0 or index2 (ends) should not count. Loop only checks i=1, so ends ignored. Good.\n\nNow check scenario where word contains non-letter? Spec says only English letters, so we don't need to handle else.\n\nNow check scenario where word contains uppercase/lowercase mix: vowels string includes both, fine.\n\nNow check scenario where word is None? Not expected; function would error on len(None). But spec assumes string input. Not required to handle.\n\nNow check scenario where word is empty string: len=0 => start=-2, stop=0 step -1 => empty => return '' correct.\n\nThus function appears correct.\n\nPotential bug: The condition word[i-1] not in vowels and word[i+1] not in vowels treats any non-vowel as consonant, which is correct given only letters. However, what about the letter 'y'? Sometimes considered vowel but spec says only a e i o u. So fine.\n\nThus answer: It is correct for all cases.\n\nWe need to output VERDICT: approve and CONFIDENCE: high.\n\nBut we must ensure we follow format: exactly two lines at end: VERDICT: approve | concerns | reject (choose one) and CONFIDENCE: low | medium | high.\n\nThus final output: include critique? The prompt: \"Give a SHARP, CONCRETE critique: - Real bugs, risks, security holes, or missing cases — be specific, name the thing. - Anything wrong with the approach, and a better one if you have it. - Skip praise and generic advice. Brevity beats completeness; ~200 words max. End with exactly two lines: VER"
+      }
+    ]
+  },
+  "HumanEval/126": {
+    "answered": 3,
+    "asked": 5,
+    "verdicts": {
+      "approve": 2,
+      "concerns": 1,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "provider": "mistral",
+        "verdict": "concerns",
+        "confidence": "medium",
+        "critique": "**CRITIQUE:**\n\n1. **Bug**: The function fails to handle the case where the list has more than two duplicates of the same number. For example, `is_sorted([1, 2, 2, 2, 3, 4])` returns `False`, which is correct, but the spec says to return `False` only if there are more than two duplicates. The function correctly returns `False` in this case, but the logic is not clear from the code.\n\n2. **Edge Case**: The function does not handle empty lists. The spec does not specify the behavior for empty lists, but it's generally good practice to handle it. The function should return `True` for an empty list since it's trivially sorted.\n\n3. **Error Handling**: The function does not handle non-integer inputs. The spec says to assume only integers, but it's still good practice to handle unexpected inputs.\n\n4. **Approach**: The approach of using `Counter` to check for duplicates is not efficient for large lists. A better approach would be to iterate through the list once and check for duplicates and sorted order simultaneously.\n\n**VERDICT:** concerns\n**CONFIDENCE:** medium"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "provider": "openrouter",
+        "verdict": "approve",
+        "confidence": "high",
+        "critique": "VERDICT: approve\nCONFIDENCE: high"
+      },
+      {
+        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "provider": "openrouter",
+        "verdict": "approve",
+        "confidence": "high",
+        "critique": "VERDICT: approve\nCONFIDENCE: high"
+      }
+    ]
+  },
+  "HumanEval/132": {
+    "answered": 3,
+    "asked": 4,
+    "verdicts": {
+      "approve": 0,
+      "concerns": 2,
+      "reject": 0,
+      "unknown": 1
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "provider": "mistral",
+        "verdict": "concerns",
+        "confidence": "medium",
+        "critique": "**CRITIQUE:**\n\n1. **Bug**: The solution fails to handle cases where the number of opening and closing brackets are not equal. For example, `is_nested('[[]')` will return `True` because it counts two opening brackets before the closing one, but it's not a valid nested structure.\n\n2. **Edge Case**: The solution doesn't handle empty strings. It will raise an `IndexError` when trying to reverse the `closing` list.\n\n3. **Approach**: The current approach is not robust enough. It only checks if there are at least two opening brackets before a closing one, but it doesn't ensure that these brackets are properly nested. A better approach would be to use a stack to track the opening brackets and ensure that each closing bracket matches the most recent opening bracket.\n\n**VERDICT: concerns**\n**CONFIDENCE: medium**"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "provider": "openrouter",
+        "verdict": "concerns",
+        "confidence": "medium",
+        "critique": "The code is incorrect.  - **Bug:** For `'[[]]'` the algorithm returns `False` because it only counts one opening bracket (`cnt=1`) and then stops; the required nesting (the inner `[` before its matching `]`) is not detected.  \n- **Logic flaw:** It checks `cnt >= 2`, meaning it needs two openings with a later closing, but the spec only requires *any* nested pair. A single valid nesting should be sufficient.  \n- **Missing case:** Unbalanced strings (e.g., `'[[']'`) are not validated; the algorithm may count spurious pairs.  \n- **Better approach:** Scan the string once, maintain a stack of opening indices, and return `True` as soon as a closing bracket pops a non‑empty stack (indicating nesting). This handles all edge cases and runs in O(n) time.\n\nVERDICT: concerns  \nCONFIDENCE: medium"
+      },
+      {
+        "model": "qwen/qwen3-32b",
+        "provider": "groq",
+        "verdict": "unknown",
+        "confidence": "unknown",
+        "critique": "<think>\nOkay, let's see. The problem is to determine if there's a valid subsequence of brackets where at least one is nested. The function should return True if such a subsequence exists. The proposed solution uses opening and closing brackets' indices.\n\nFirst, the code collects all positions of '[' and ']' in opening and closing lists. Then, it reverses closing. The idea seems to be to match each opening bracket with a closing one that comes after it. The count is incremented if an opening bracket is before a closing one. If the count is at least 2, returns True.\n\nBut wait, what's a valid subsequence with nesting? For example, \"[[]]\" has two levels. The solution counts pairs where opening is before closing. But how does that ensure nesting?\n\nLet's test some cases. The example is_nested('[[]]') should return True. The opening indices are [0, 1], closing are [2, 3]. Reversed closing is [3, 2]. For each opening index (0, 1), compare with closing[i]. For i=0, 0 < 3 → cnt=1, i=1. Next opening is 1, compare with closing[1] which is 2. 1 < 2 → cnt=2. So returns True. Correct.\n\nAnother example: is_nested('[]') → False. The code would have cnt=1, which is less than 2. Correct.\n\nBut what about a case like \"[[][]]\"? The example says it should return True. The opening indices are [0, 2], closing are [1, 3]. Reversed closing is [3, 1]. For opening 0: compare with closing[0=3 → 0 < 3 → cnt=1, i=1. Next opening 2: compare with closing[1=1 → 2 is not < 1 → no increment. So cnt=1. Return False. But according to the example, the correct answer is True. So the code fails here.\n\nAh, the problem is that the code counts the number of matched pairs, but nesting requires that there's at least one level of nesting. For example, in \"[[][]]\", the subsequence is two separate pairs, not nested. So the code correctly returns False. Wait, but the example says is_nested('[[][]]') ➞ True. Oh, that's a problem. Wait, the example given in the problem says [[][]] should return True. Wait, how is that possible? Because the subsequence could be [ [ ] ] which is nested. Wait, maybe the string is \"[[][]]\" which is [ [ ] ] [ ] — so the first three characters are [ [ ] and then ] [ ]. So the first part is [ [ ] ] which is a valid nested structure. So the code for [ [ ] ] [ ] would have opening indices 0,1,3 and closing 2,4. Reversed closing is [4,2]. For each opening index:\n\n0 < 4 → cnt +=1, i=1. Next opening is 1 < 4 → cnt +=1, i=2 (since i=1, closing[1] is 2. 1 < 2 → cnt becomes 2. So returns True. So in this case, the code returns True. But the example given in the problem says is_nested('[[][]]') ➞ True. So maybe the code is correct here. Wait, the example shows [[][]] returns True. Let me check the code again.\n\nWait, the string \"[[][]]\" is \"[[]][ ]\". The code would collect opening indices at 0, 1, 3. Closing at 2, 4. Reversed closing is [4, 2]. Then for each opening index:\n\nFirst opening is 0. Compare with closing[0] =4 → 0 <4 → cnt=1, i=1. Next opening is 1. Compare with closing[1]=2 → 1 <2 → cnt=2. So returns True. Which is correct because there is a nested pair [ [ ] ].\n\nBut in the example given, the code returns True for [[][]], which is correct. So why does the code pass that case?\n\nBut what about a case where there are two pairs but not nested? Like \"[][]\". The code would have opening indices 0 and 2. Closing indices 1 and 3. Reversed closing is [3,1]. For opening 0: compare with 3 → cnt=1, i=1. Next opening is 2. Compare with closing[1]=1 → 2 is not < 1 → no increment. So cnt=1 → returns False. Which is correct as per the example.\n\nAnother test case: \"[[]][[\". The example says returns True. The string is \"[[]][[\", which is \"[ [ ] ] [ [\". The opening indices are 0,1,4,5. Closing are 3, 2. Reversed closing is [3,2]. For each opening:\n\n0 <3 → cnt=1, i=1. Next opening 1 <3 → cnt=2. So returns True. Which is correct because there's a nested part [ [ ] ].\n\nBut what about a case where the brackets are properly nested but the code misses? Let's think of a case where there's exactly one level of nesting. For example, \"[[]]\". The code counts two pairs (as in the first example) → returns True. Correct.\n\nNow, what about a case where the code returns True when there's no nesting? For example, \"[]][[]\". Wait, that's invalid brackets. But the problem says the input is only brackets. So maybe the code is supposed to handle valid bracket sequences. Wait, the problem says the input is a string of brackets, but the function is to check if there's a valid subsequence with nesting. So the code doesn't need to check if the entire string is valid. So perhaps the code can have invalid bracket sequences but still have a valid subsequence.\n\nBut the code's approach is to match each opening bracket with a closing bracket that comes after it. The count is the number of matched pairs. The code returns True if there are at least two matched pairs. But that's not sufficient for nesting.\n\nWait, the problem requires that there's at least one nested bracket in the subsequence. For example, two matched pairs could be non-nested. Like \"[[]]\" has two pairs and is nested. But \"[][]\" has two pairs but not nested. The code returns False for \"[][]\", which is correct. So the code counts the number of matched pairs. If there are at least two, then it returns True. But how does that ensure nesting?\n\nWait, the code's logic is that if there are at least two matched pairs, then there's nesting. But that's not correct. For example, consider \"[[]]\". The code counts two matched pairs, which is correct. But if there are two matched pairs that are not nested, like \"[][]\", the code counts two pairs? Wait no. For \"[][]\", opening indices are 0 and 2. Closing indices are 1 and 3. Reversed closing is [3,1]. For each opening:\n\nFirst opening is 0. Compare with closing[0]=3 → 0 <3 → cnt=1, i=1. Next opening is 2. Compare with closing[1]=1 → 2 is not <1 → no increment. So cnt=1. So returns False. Which is correct.\n\nBut what if there are two matched pairs that are overlapping but not nested? Like \"[]][[]\". Wait, but the code's approach is to match opening with closing in order. Let's see. For the string \"[]][[]\", the opening indices are 0, 3. Closing indices are 1, 4. Reversed closing is [4,1]. For opening 0: compare with 4 → 0 <4 → cnt=1, i=1. Next opening 3: compare with closing[1]=1 → 3 is not <1 → no increment. So cnt=1. So returns False. Which is correct because there's no nesting.\n\nSo the code's logic seems to count the number of matched pairs where each opening is before a closing, and if there are at least two such pairs, returns True. But how does that ensure that there is nesting?\n\nWait, the problem says that the subsequence must have at least one nested bracket. So for example, a valid subsequence could be something like \"[[]]\", which has two levels. The code returns True when there are two matched pairs. But what if there are two matched pairs that are not nested?\n\nWait, the code counts the number of matched pairs. For example, in \"[[][[ ]]]\", there are three matched pairs. But the code would count three pairs. However, the code returns True if there are two or more. But the problem requires that there's at least one level of nesting. So even if there's one level of nesting, the code returns True. But how to ensure that?\n\nWait, the code's approach is to count the number of matched pairs. But the presence of at least two matched pairs implies that there is nesting? Let's think.\n\nIf there's exactly one matched pair, then the string is something like \"[...]\", but no nesting. So returns False. If there are two matched pairs, then perhaps they are nested. For example, \"[[]]\" has two matched pairs and is nested."
+      }
+    ]
+  },
+  "HumanEval/145": {
+    "answered": 3,
+    "asked": 4,
+    "verdicts": {
+      "approve": 1,
+      "concerns": 2,
+      "reject": 0,
+      "unknown": 0
+    },
+    "critiques": [
+      {
+        "model": "codestral-2508",
+        "provider": "mistral",
+        "verdict": "concerns",
+        "confidence": "medium",
+        "critique": "**CRITIQUE:**\n\n1. **Bug**: The function fails to handle negative numbers correctly. For example, `ds(-12)` returns `-3` instead of `-3` (which is correct), but `ds(-11)` returns `-2` (correct), and `ds(-1)` returns `-1` (correct). However, the sorting order is not preserved for negative numbers with the same digit sum. For instance, `order_by_points([-1, -11, -12])` returns `[-1, -11, -12]` instead of `[-1, -11, -12]` (which is correct). The issue is that the negative sign is not being considered in the sorting order.\n\n2. **Edge Case**: The function does not handle empty lists correctly. The docstring specifies that `order_by_points([])` should return `[]`, which it does. However, the function does not explicitly handle this case, which could be considered a missing case.\n\n3. **Approach**: The approach of using a nested function `ds` to calculate the digit sum is correct. However, the handling of negative numbers could be improved. Instead of modifying the first digit, it would be better to calculate the absolute value of the number and then negate the sum if the number is negative. This would make the code more readable and less error-prone.\n\n**VERDICT: concerns**\n**CONFIDENCE: medium**"
+      },
+      {
+        "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "provider": "openrouter",
+        "verdict": "concerns",
+        "confidence": "high",
+        "critique": "VERDICT: concerns  \nCONFIDENCE: high  \n\nThe digit‑sum function `ds` is wrong for negative integers. It negates the first digit (`digits[0] = -digits[0]`) before summing, so `-12` yields `1` instead of the correct `3` (1 + 2). This violates the spec’s requirement to sort by the sum of the digits of the absolute value. The rest of the logic (stable sort preserving original order for ties) is fine, but the core correctness bug makes the solution incorrect for all cases with negative numbers. Fix `ds` to return `sum(int(c) for c in str(abs(n)))` without any sign manipulation."
+      },
+      {
+        "model": "openai/gpt-oss-120b",
+        "provider": "groq",
+        "verdict": "approve",
+        "confidence": "high",
+        "critique": "The key function `ds` treats a negative number by negating only its most‑significant digit (e.g. ‑12 → –1 + 2 = 1). This matches the provided example, where `‑1` is ordered before `1` and `‑11` before `11`. The sort uses Python’s stable `sorted`, so items with equal digit‑sum keep their original relative order, satisfying the “index in original list” rule.\n\nAll edge cases are handled:\n* `0` → sum 0.\n* Large integers are safe (string conversion and integer sum).\n* Empty list returns `[]`.\n* The function works for any integer (including negative and positive).\n\nNo bugs, missing cases, or security concerns are present given the specification and example behavior.\n\nVERDICT: approve  \nCONFIDENCE: high"
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "HumanEval/2": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/32": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/99": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/108": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/118": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/126": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/132": {
+    "pass": true,
+    "err": ""
+  },
+  "HumanEval/145": {
+    "pass": true,
+    "err": ""
+  }
+}
